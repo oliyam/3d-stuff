@@ -429,13 +429,13 @@ private:
 								;
 							vector<double> angles = { angle1,angle2,angle3 };
 							//compute color of every vertex
-							/*
+							
 							Uint8 colors[3][4] = {
 								{color[0] * angle1, color[1] * angle1, color[2] * angle1, color[3] * angle1},
 								{color[0] * angle2, color[1] * angle2, color[2] * angle2, color[3] * angle2},
 								{color[0] * angle3, color[1] * angle3, color[2] * angle3, color[3] * angle3}
 							};
-							*/
+							
 							//get uv coordinates of every vertex
 							vector<vec2> uvs = {
 								o.uv_texture_coordinates.at(o.uv.at(i).at(0) - 1),
@@ -451,10 +451,10 @@ private:
 
 							//draw the face
 							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
-							drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							//fillFace(frame, frame_width, frame_height, points, colors);
+							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
+							fillFace(frame, frame_width, frame_height, points, colors);
 							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
-
+		
 							/*
 							//draw normals
 							for (int v = 0; v < f.size(); v++) {

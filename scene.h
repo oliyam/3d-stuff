@@ -108,6 +108,8 @@ class Scene {
 		Scene() 
 		{
 			objects.push_back(object("test.obj", "test_smooth.obj", true));
+			objects.push_back(object("test.obj", "test_smooth.obj", true));
+			objects.push_back(object("test.obj", "test_smooth.obj", true));
 			//objects.push_back(object("grid.obj", false));
 			for(int i=1;i<=3;i++)
 				cameras.push_back(camera(vec3(i * -10, i * -10, i * -10), vec3(30, -45, 0), 10));
