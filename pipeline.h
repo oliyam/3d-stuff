@@ -20,6 +20,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
+
 class Pipeline {
 
 private:
