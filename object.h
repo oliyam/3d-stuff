@@ -78,73 +78,6 @@ public:
 		for (int i = 0; i < 3; i++)
 			axes[i] = axes[i].rotate(axes[axis], angle);
 	}
-	
-	/*
-	reads an .obj file from the path path
-	*/
-	void readObj(string path)
-	{
-		int numberOfNormals;
-		string line;
-		ifstream objectFile(path);
-
-		//reads the file line by line
-		while (getline(objectFile, line))
-		{
-			//name
-			if (line.substr(0, 2) == ("o "))
-			{
-				name = split(line, ' ').at(1);
-			}
-			//vertices
-			else if (line.substr(0, 2) == ("v "))
-			{
-				vector<string> list = split(line, ' ');
-				vertices.push_back(
-					vec3(
-						stof(list.at(1)),
-						stof(list.at(2)),
-						stof(list.at(3))
-					));
-			}
-			//uv texture coordinates
-			else if (line.substr(0, 3) == ("vt "))
-			{
-				vector<string> list = split(line, ' ');
-				uv_texture_coordinates.push_back(vec2(stof(list.at(1)), stof(list.at(2))));
-			}
-			//vertex normals (somehow face normals in blender)
-			else if (line.substr(0, 3) == ("vn "))
-			{
-				vector<string> list = split(line, ' ');
-				normals.push_back(
-					vec3(
-						stof(list.at(1)),
-						stof(list.at(2)),
-						stof(list.at(3))
-					));
-			}
-			//faces
-			else if (line.substr(0, 2) == ("f "))
-			{
-				vector<string> list1 = split(line, ' ');
-				vector<int> face_vertices;
-				vector<int> face_face_normals;
-				vector<int> face_vertex_normals;
-				for (int i = 1; i < list1.size(); i++)
-				{
-					vector<string> list2 = split(list1.at(i), '/');
-					face_vertices.push_back(stoi(list2.at(0)));
-					face_face_normals.push_back(stoi(list2.at(2)));
-					face_vertex_normals.push_back(stoi(list2.at(2)));
-				}
-				faces.push_back(face_vertices);
-				face_normals.push_back(normals.at(face_face_normals.at(0) - 1));
-				vertex_normals.push_back(face_vertex_normals);
-			}
-		}
-		objectFile.close();
-	}
 
 	/*
 	reads an .obj file from the path path and a smooth object
@@ -250,14 +183,6 @@ public:
 		culling = primitive_culling;
 		//reading .obj file with path to smooth object
 		readObj(path, smooth_path);
-	}
-
-	object(string path, bool primitive_culling)
-	{
-		//sets culling flag
-		culling = primitive_culling;
-		//reading .obj file with path to smooth object
-		readObj(path);
 	}
 
 	//getters

@@ -182,9 +182,9 @@ int main(int argc, char* args[])
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 						pixels[y * SCREEN_WIDTH + x] = 0 * 256 * 256 * 256 + 70 * 256 * 256 + 70 * 256 + 70;
-				
+				*/
 				//cool gradient
-				
+				/*
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 					{

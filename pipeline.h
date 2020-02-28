@@ -355,10 +355,6 @@ private:
 	/*
 	some attributes
 	*/
-	//opencl stuff
-	//Program halloWelt 
-	//auto context = platform.getInfo<>();
-	//other attributes
 	chrono::steady_clock::time_point currentTime, lastTime = Clock::now();
 	double interval = 0.125;
 	int current_texture = 0;
@@ -371,6 +367,18 @@ private:
 	public:
 		//constructor
 		Pipeline(string path, int number) {
+
+			//OpenCL stuff
+			Program halloWelt = getProgram("CLkernels/helloWorld.cl");
+			Context context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
+			vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
+			Device device = devices.front();
+			//memory buffer as kernel argument
+			char buf[16];
+			Buffer memBuf(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(buf));
+			Kernel kernel(halloWelt, "HELO");
+			kernel.setArg(0, memBuf);
+
 			/*
 			memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
 			for (int x = 0; x < size[0][0]; x++)
@@ -439,11 +447,17 @@ private:
 								;
 							vector<double> angles = { angle1,angle2,angle3 };
 							//compute color of every vertex
-							
+							/*
 							Uint8 colors[3][4] = {
 								{color[0] * angle1, color[1] * angle1, color[2] * angle1, color[3] * angle1},
 								{color[0] * angle2, color[1] * angle2, color[2] * angle2, color[3] * angle2},
 								{color[0] * angle3, color[1] * angle3, color[2] * angle3, color[3] * angle3}
+							};
+							*/
+							Uint8 colors[3][4] = {
+								{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
+								{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
+								{ CMY_COLORS[0][0], CMY_COLORS[0][1], CMY_COLORS[0][2], CMY_COLORS[0][3] }
 							};
 							
 							//get uv coordinates of every vertex
@@ -462,8 +476,8 @@ private:
 							//draw the face
 							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
 							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							//fillFace(frame, frame_width, frame_height, points, colors);
-							fillFace(OUTLINE, frame, frame_width, frame_height, points);
+							fillFace(frame, frame_width, frame_height, points, colors);
+							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*
 							//draw normals
@@ -503,7 +517,8 @@ private:
 				//draw all lights in the scene
 				for (light i : scene.getLights())
 					drawCircle(RGB_COLORS[1], frame, frame_width, frame_height, 10, 10, 10);
-
+				*/
+				/*
 				//draw all cameras in the scene (except active one)
 				for (int i = 0; i < scene.getCameras().size(); i++)
 					if (i != scene.activeCam())

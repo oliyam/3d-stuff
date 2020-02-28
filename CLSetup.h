@@ -7,8 +7,8 @@
 using std::string;
 using namespace cl;
 using namespace std;
-/*
-Program Hello()
+
+Program getProgram(string path)
 {
 	vector<Device> devices;
 	vector<Platform> platforms;
@@ -38,6 +38,17 @@ Program Hello()
 		//<< ", Extensions: " << devices[i].getInfo<CL_DEVICE_EXTENSIONS>()
 		<< endl;
 
+	Device device = devices.front();
+
+	ifstream programfile(path);
+	string src(istreambuf_iterator<char>(programfile), (istreambuf_iterator<char>()));
 	
-	return platforms.front();
-}*/
+	Program::Sources sources(1, make_pair(src.c_str(), src.length() + 1));
+
+	Context context(device);
+	Program program(context, sources);
+
+	program.build("-cl-std=CL1.2");
+
+	return program;
+}
