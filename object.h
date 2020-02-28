@@ -153,7 +153,7 @@ public:
 	{
 		int numberOfNormals;
 		string line;
-		ifstream objectFile(path);
+		ifstream objectFile("assets/objects/" + path);
 
 		//reads the file line by line
 		while (getline(objectFile, line))
@@ -215,7 +215,7 @@ public:
 		numberOfNormals = normals.size();
 
 		//reads smooth object
-		ifstream smooth_objectFile(smooth_path);
+		ifstream smooth_objectFile("assets/objects/" + smooth_path);
 		while (getline(smooth_objectFile, line))
 		{
 			//vertex normals (somehow face normals in blender)

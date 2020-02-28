@@ -385,7 +385,7 @@ private:
 				size[i] = new int[2];
 			texture = new Uint32* [number_of_textures];
 			string extension = ".bmp";
-			string file_name = path;
+			string file_name = "assets/bitmaps/" + path;
 			for (int i = 0; i < number_of_textures; i++) {
 				char* texture_file = readFileBytes(file_name+to_string(i+1)+extension);
 				size[i][0] = (Uint8)texture_file[18] * pow(0x100, 0) + (Uint8)texture_file[19] * pow(0x100, 1) + (Uint8)texture_file[20] * pow(0x100, 2) + (Uint8)texture_file[21] * pow(0x100, 3);
