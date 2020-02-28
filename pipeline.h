@@ -11,6 +11,7 @@
 #include <ctime>
 #include <chrono>
 
+#include "CLSetup.h"
 #include "vectors.h"
 #include "object.h"
 #include "scene.h"
@@ -216,7 +217,7 @@ private:
 		for (int i = 0; i < points.size() - 1; i++)
 			drawLineToBoolBuffer(buffer, size_x, size_y, points.at(i), points.at(i + 1));
 		drawLineToBoolBuffer(buffer, size_x, size_y, points.at(0), points.at(points.size() - 1));
-		
+		//all vertex coordinates
 		double
 			x_v1 = points.at(0).getX(),
 			y_v1 = points.at(0).getY(),
@@ -227,6 +228,14 @@ private:
 			;
 		int first = 0, last = 0;
 		bool first_time;
+		double d1 = ((y_v2 - y_v3) * (x_v1 - x_v3) + (x_v3 - x_v2) * (y_v1 - y_v3));
+		//uv coordinates at vertices divided by the z value of the vertex
+		vec2
+			uv_1 = uv_coords.at(0) / z.at(0),
+			uv_2 = uv_coords.at(1) / z.at(1),
+			uv_3 = uv_coords.at(2) / z.at(2)
+			;
+		//loop through rows
 		for (int y = 0; y < size_y; y++)
 		{
 			
@@ -245,16 +254,11 @@ private:
 				for (int x = first; x <= last; x++) {
 					//calculating all the interpolation weights
 					double
-						w_v1 = ((y_v2 - y_v3) * (x - x_v3) + (x_v3 - x_v2) * (y - y_v3)) / ((y_v2 - y_v3) * (x_v1 - x_v3) + (x_v3 - x_v2) * (y_v1 - y_v3)),
-						w_v2 = ((y_v3 - y_v1) * (x - x_v3) + (x_v1 - x_v3) * (y - y_v3)) / ((y_v2 - y_v3) * (x_v1 - x_v3) + (x_v3 - x_v2) * (y_v1 - y_v3)),
+						w_v1 = ((y_v2 - y_v3) * (x - x_v3) + (x_v3 - x_v2) * (y - y_v3)) / d1,
+						w_v2 = ((y_v3 - y_v1) * (x - x_v3) + (x_v1 - x_v3) * (y - y_v3)) / d1,
 						w_v3 = 1 - w_v1 - w_v2
 						;
-					//uv coordinates at vertices divided by the z value of the vertex
-					vec2
-						uv_1 = uv_coords.at(0) / z.at(0),
-						uv_2 = uv_coords.at(1) / z.at(1),
-						uv_3 = uv_coords.at(2) / z.at(2)
-						;
+
 					//interpolate 1/z
 					double w = (1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3;
 					//calculation of uv coordinates
@@ -348,7 +352,13 @@ private:
 		return tex;
 	}
 
-	//some attributes
+	/*
+	some attributes
+	*/
+	//opencl stuff
+	//Program halloWelt 
+	//auto context = platform.getInfo<>();
+	//other attributes
 	chrono::steady_clock::time_point currentTime, lastTime = Clock::now();
 	double interval = 0.125;
 	int current_texture = 0;
@@ -452,8 +462,8 @@ private:
 							//draw the face
 							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
 							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							fillFace(frame, frame_width, frame_height, points, colors);
-							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
+							//fillFace(frame, frame_width, frame_height, points, colors);
+							fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*
 							//draw normals
