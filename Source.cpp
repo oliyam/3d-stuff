@@ -49,7 +49,7 @@ int main(int argc, char* args[])
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 
-	SDL_Window* window = SDL_CreateWindow("3D Stuff yo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+	SDL_Window* window = SDL_CreateWindow("3D Stuff yo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);// SDL_RENDERER_ACCELERATED);
 	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -60,7 +60,7 @@ int main(int argc, char* args[])
 	int number = 3;
 
 	Scene scene = Scene();
-	Pipeline pipe = Pipeline(pictures, number);
+	Pipeline pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//declare pixel array accommodating all pixels on the screen
 	Uint32* pixels = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -72,7 +72,6 @@ int main(int argc, char* args[])
 	int mouseX, mouseY;
 	Uint8 GREEN[4] = { 0,0,255,0 };
 	Uint8 BLACK[4] = { 0,0,0,0 };
-
 
 	//HideConsole();
 	ShowConsole();
@@ -136,7 +135,7 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_l:
-					pipe = Pipeline(pictures, number);
+					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT);
 					scene.setObj(0, object("test.obj", "test_smooth.obj", true));
 					break;
 				case SDLK_a:

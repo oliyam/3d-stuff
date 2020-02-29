@@ -156,14 +156,14 @@ private:
 	/*
 	fills a face ... with interpolation stuff going on
 	*/
-	void fillFace(Uint32* pixels, int size_x, int size_y, vector<vec2> points, Uint8 color[3][4])
+	void fillFace(Uint32* pixels, int size_x, int size_y, vector<vec2> points, Uint8 color[3][4], vector<double> z)
 	{
 		bool* buffer = new bool[size_x * size_y];
 		memset(buffer, 0, size_x * size_y);
 		for (int i = 0; i < points.size() - 1; i++)
 			drawLineToBoolBuffer(buffer, size_x, size_y, points.at(i), points.at(i + 1));
 		drawLineToBoolBuffer(buffer, size_x, size_y, points.at(0), points.at(points.size() - 1));
-
+		//coordinates of points
 		double
 			x_v1 = points.at(0).getX(),
 			y_v1 = points.at(0).getY(),
@@ -186,7 +186,15 @@ private:
 				else if (buffer[y * size_x + x])
 					last = x;
 			}
-			if (!first_time)
+			if (!first_time) {
+				vector<double> pointbuffer = {
+					x_v1,
+					y_v1,
+					x_v2,
+					y_v2,
+					x_v3,
+					y_v3
+				};
 				for (int x = first; x <= last; x++) {
 					//calculating all the interpolation weights
 					double
@@ -201,9 +209,17 @@ private:
 						g = ((color[0][2] * w_v1 + color[1][2] * w_v2 + color[2][2] * w_v3) * 256),
 						b = ((color[0][3] * w_v1 + color[1][3] * w_v2 + color[2][3] * w_v3))
 						;
-					pixels[y * size_x + x] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+					//interpolate 1/z
+					double w = ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
+					if (zBuffer[y * size_x + x] < w)
+					{
+						zBuffer[y * size_x + x] = w;
+						pixels[y * size_x + x] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+					}
 				}
+			}
 		}
+		
 		delete[] buffer;
 	}
 	/*
@@ -260,11 +276,11 @@ private:
 						;
 
 					//interpolate 1/z
-					double w = (1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3;
+					double w = 1 / ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
 					//calculation of uv coordinates
 					double
-						u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * 1 / w,
-						v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * 1 / w
+						u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * w,
+						v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * w
 						;
 
 					int
@@ -325,6 +341,10 @@ private:
 		return vec3(point.getX() * cam.getFocus() / point.getZ(), point.getY() * cam.getFocus() / point.getZ(), point.getZ());
 	}
 
+
+	/*
+	reads a file to a char buffer
+	*/
 	char* readFileBytes(string path) {
 		ifstream file(path, ios::binary | ios::ate);
 		streamsize length = file.tellg();
@@ -336,6 +356,10 @@ private:
 		return ret;
 	}
 
+	/*
+	converts a bitmap file (in  form of a char buffer)
+	into a texture buffer of unsigned 32bit integers
+	*/
 	Uint32* bitmapToTexture(char* bitmap, int size_x, int size_y) {
 		Uint32* tex = new Uint32[size_x * size_y];
 		int pos = 0;
@@ -363,6 +387,8 @@ private:
 	Uint32** texture;
 	Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 }, OUTLINE[4] = {0,255,165,0};
 	Uint8* color = NORMALS;
+	int size_x, size_y;
+	double* zBuffer;
 
 	//opencl attributes
 	Program halloWelt;
@@ -370,16 +396,23 @@ private:
 	Buffer outBuf, inBuf;
 	Device device;
 	vector<int> vec;
+	CommandQueue queue;
+	Kernel kernel;
 
 	public:
 		//constructor
-		Pipeline(string path, int number) {
-			
+		Pipeline(string path, int number, int x, int y) {
+			size_x = x;
+			size_y = y;
+			zBuffer = new double[x * y];
+			memset(zBuffer, 0, x * y * sizeof(double));
+			/*
 			//OpenCL stuff
 			halloWelt = getProgram("CLkernels/helloWorld.cl");
 			context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
 			vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 			device = devices.front();
+			
 			
 			vec = vector<int>(15);
 			fill(vec.begin(), vec.end(), 10);
@@ -387,18 +420,22 @@ private:
 			//memory buffer as kernel arguments
 			inBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR, sizeof(int) * vec.size(), vec.data());
 			outBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * vec.size(), nullptr);
-			Kernel kernel(halloWelt, "ProcessArray");
+			kernel = Kernel(halloWelt, "ProcessArray");
 			kernel.setArg(0, inBuf);
 			kernel.setArg(1, outBuf);
 
-			CommandQueue queue(context, device);
+			queue = CommandQueue(context, device);
 			
 			//queue.enqueueFillBuffer(inBuf, 3, sizeof(int) * 10, sizeof(int)* (vec.size()-10));
 			queue.enqueueNDRangeKernel(kernel, NullRange, NDRange(vec.size()));
 			queue.enqueueReadBuffer(outBuf, CL_FALSE, 0, sizeof(int) * vec.size(), vec.data());
 
+			for (int i : vec)
+				cout<< i <<endl;
+
 			finish();
-			
+			*/
+
 			/*
 			//generates checkerboard texture
 			memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
@@ -426,6 +463,7 @@ private:
 		void draw(Scene scene, Uint32* frame, int frame_width, int frame_height) {
 			//test if there is an active camera
 			if (scene.activeCam() != -1) {
+				memset(zBuffer, 0, size_x * size_y * sizeof(double));
 				vec2 center = vec2(frame_width / 2, frame_height / 2);
 				camera cam = scene.getActiveCam();
 				//Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 };
@@ -498,7 +536,7 @@ private:
 							//draw the face
 							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
 							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							fillFace(frame, frame_width, frame_height, points, colors);
+							fillFace(frame, frame_width, frame_height, points, colors, z);
 							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*
