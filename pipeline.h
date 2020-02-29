@@ -364,22 +364,43 @@ private:
 	Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 }, OUTLINE[4] = {0,255,165,0};
 	Uint8* color = NORMALS;
 
+	//opencl attributes
+	Program halloWelt;
+	Context context;
+	Buffer outBuf, inBuf;
+	Device device;
+	vector<int> vec;
+
 	public:
 		//constructor
 		Pipeline(string path, int number) {
-
+			
 			//OpenCL stuff
-			Program halloWelt = getProgram("CLkernels/helloWorld.cl");
-			Context context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
+			halloWelt = getProgram("CLkernels/helloWorld.cl");
+			context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
 			vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
-			Device device = devices.front();
-			//memory buffer as kernel argument
-			char buf[16];
-			Buffer memBuf(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(buf));
-			Kernel kernel(halloWelt, "HELO");
-			kernel.setArg(0, memBuf);
+			device = devices.front();
+			
+			vec = vector<int>(15);
+			fill(vec.begin(), vec.end(), 10);
+			
+			//memory buffer as kernel arguments
+			inBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR, sizeof(int) * vec.size(), vec.data());
+			outBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * vec.size(), nullptr);
+			Kernel kernel(halloWelt, "ProcessArray");
+			kernel.setArg(0, inBuf);
+			kernel.setArg(1, outBuf);
 
+			CommandQueue queue(context, device);
+			
+			//queue.enqueueFillBuffer(inBuf, 3, sizeof(int) * 10, sizeof(int)* (vec.size()-10));
+			queue.enqueueNDRangeKernel(kernel, NullRange, NDRange(vec.size()));
+			queue.enqueueReadBuffer(outBuf, CL_FALSE, 0, sizeof(int) * vec.size(), vec.data());
+
+			finish();
+			
 			/*
+			//generates checkerboard texture
 			memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
 			for (int x = 0; x < size[0][0]; x++)
 				for (int y = 0; y < size[0][1]; y++)
@@ -421,6 +442,7 @@ private:
 				int t = current_texture % number_of_textures;
 
 				for (object o : scene.getObjects()) {
+
 					//draw all faces
 					for (int i = 0; i < o.faces.size(); i++) {
 						vector<int> f = o.faces.at(i);

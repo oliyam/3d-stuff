@@ -42,7 +42,7 @@ int main(int argc, char* args[])
 	bool stop = false;
 	int frame = 0;
 	double angle = 0;
-	int shift = 0;
+	int shift = 8;
 	bool quit = false;
 	SDL_Event event;
 
