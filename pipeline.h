@@ -227,82 +227,81 @@ private:
 	*/
 	void drawTextureToFace(Uint32* pixels, int size_x, int size_y, vector<vec2> points, vector<vec2> uv_coords, vector<double> z, int texture_multiplier_x, int texture_multiplier_y, Uint32* texture, int size_x_texture, int size_y_texture, vector<double> vertex_normal_angle)
 	{
-		
-		bool* buffer = new bool[size_x * size_y];
-		memset(buffer, 0, size_x * size_y);
-		for (int i = 0; i < points.size() - 1; i++)
-			drawLineToBoolBuffer(buffer, size_x, size_y, points.at(i), points.at(i + 1));
-		drawLineToBoolBuffer(buffer, size_x, size_y, points.at(0), points.at(points.size() - 1));
-		//all vertex coordinates
-		double
-			x_v1 = points.at(0).getX(),
-			y_v1 = points.at(0).getY(),
-			x_v2 = points.at(1).getX(),
-			y_v2 = points.at(1).getY(),
-			x_v3 = points.at(2).getX(),
-			y_v3 = points.at(2).getY()
-			;
-		int first = 0, last = 0;
-		bool first_time;
-		double d1 = ((y_v2 - y_v3) * (x_v1 - x_v3) + (x_v3 - x_v2) * (y_v1 - y_v3));
-		//uv coordinates at vertices divided by the z value of the vertex
-		vec2
-			uv_1 = uv_coords.at(0) / z.at(0),
-			uv_2 = uv_coords.at(1) / z.at(1),
-			uv_3 = uv_coords.at(2) / z.at(2)
-			;
-		//loop through rows
-		for (int y = 0; y < size_y; y++)
-		{
-			
-			first_time = true;
-			for (int x = 0; x < size_x; x++)
+			bool* buffer = new bool[size_x * size_y];
+			memset(buffer, 0, size_x * size_y);
+			for (int i = 0; i < points.size() - 1; i++)
+				drawLineToBoolBuffer(buffer, size_x, size_y, points.at(i), points.at(i + 1));
+			drawLineToBoolBuffer(buffer, size_x, size_y, points.at(0), points.at(points.size() - 1));
+			//all vertex coordinates
+			double
+				x_v1 = points.at(0).getX(),
+				y_v1 = points.at(0).getY(),
+				x_v2 = points.at(1).getX(),
+				y_v2 = points.at(1).getY(),
+				x_v3 = points.at(2).getX(),
+				y_v3 = points.at(2).getY()
+				;
+			int first = 0, last = 0;
+			bool first_time;
+			double d1 = ((y_v2 - y_v3) * (x_v1 - x_v3) + (x_v3 - x_v2) * (y_v1 - y_v3));
+			//uv coordinates at vertices divided by the z value of the vertex
+			vec2
+				uv_1 = uv_coords.at(0) / z.at(0),
+				uv_2 = uv_coords.at(1) / z.at(1),
+				uv_3 = uv_coords.at(2) / z.at(2)
+				;
+			//loop through rows
+			for (int y = 0; y < size_y; y++)
 			{
-				if (first_time && buffer[y * size_x + x]) {
-					first = x;
-					first_time = false;
-				}
-				else if (buffer[y * size_x + x])
-					last = x;
-			}
-			
-			if (!first_time)
-				for (int x = first; x <= last; x++) {
-					//calculating all the interpolation weights
-					double
-						w_v1 = ((y_v2 - y_v3) * (x - x_v3) + (x_v3 - x_v2) * (y - y_v3)) / d1,
-						w_v2 = ((y_v3 - y_v1) * (x - x_v3) + (x_v1 - x_v3) * (y - y_v3)) / d1,
-						w_v3 = 1 - w_v1 - w_v2
-						;
 
-					//interpolate 1/z
-					double w = ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
-					//calculation of uv coordinates
-					double
-						u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * 1 / w,
-						v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * 1 / w
-						;
-
-					int
-						u = abs((int)((u1 * size_x_texture) * texture_multiplier_x) % (size_x_texture)),
-						v = abs(((int)(v1 * size_y_texture) * texture_multiplier_y) % (size_y_texture))
-						;
-					//cout << "u: "<< u << "; v:" << v << endl;
-					//calculation of all color channels (argb)
-					Uint32 color[4] = {
-						(texture[v * size_x_texture + u] & 0xFF000000) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
-						(texture[v * size_x_texture + u] & 0x00FF0000) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
-						(texture[v * size_x_texture + u] & 0x0000FF00) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
-						(texture[v * size_x_texture + u] & 0x000000FF) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3)
-					};
-					if (zBuffer[y * size_x + x] < w)
-					{
-						zBuffer[y * size_x + x] = w;
-						pixels[y * size_x + x] = (color[0] & 0xFF000000) | (color[1] & 0x00FF0000) | (color[2] & 0x0000FF00) | (color[3] & 0x000000FF);
+				first_time = true;
+				for (int x = 0; x < size_x; x++)
+				{
+					if (first_time && buffer[y * size_x + x]) {
+						first = x;
+						first_time = false;
 					}
+					else if (buffer[y * size_x + x])
+						last = x;
 				}
-		}
-		delete[] buffer;
+
+				if (!first_time)
+					for (int x = first; x <= last; x++) {
+						//calculating all the interpolation weights
+						double
+							w_v1 = ((y_v2 - y_v3) * (x - x_v3) + (x_v3 - x_v2) * (y - y_v3)) / d1,
+							w_v2 = ((y_v3 - y_v1) * (x - x_v3) + (x_v1 - x_v3) * (y - y_v3)) / d1,
+							w_v3 = 1 - w_v1 - w_v2
+							;
+
+						//interpolate 1/z
+						double w = ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
+						//calculation of uv coordinates
+						double
+							u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * 1 / w,
+							v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * 1 / w
+							;
+
+						int
+							u = abs((int)((u1 * size_x_texture) * texture_multiplier_x) % (size_x_texture)),
+							v = abs(((int)(v1 * size_y_texture) * texture_multiplier_y) % (size_y_texture))
+							;
+						//cout << "u: "<< u << "; v:" << v << endl;
+						//calculation of all color channels (argb)
+						Uint32 color[4] = {
+							(texture[v * size_x_texture + u] & 0xFF000000) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
+							(texture[v * size_x_texture + u] & 0x00FF0000) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
+							(texture[v * size_x_texture + u] & 0x0000FF00) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
+							(texture[v * size_x_texture + u] & 0x000000FF) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3)
+						};
+						if (zBuffer[y * size_x + x] < w)
+						{
+							zBuffer[y * size_x + x] = w;
+							pixels[y * size_x + x] = (color[0] & 0xFF000000) | (color[1] & 0x00FF0000) | (color[2] & 0x0000FF00) | (color[3] & 0x000000FF);
+						}
+					}
+			}
+			delete[] buffer;
 	}
 	/*
 	projection ... lel
@@ -389,6 +388,11 @@ private:
 	int** size;
 	Uint32** texture;
 	Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 }, OUTLINE[4] = {0,255,165,0};
+	Uint8 colors[3][4] = {
+					{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
+					{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
+					{ CMY_COLORS[0][0], CMY_COLORS[0][1], CMY_COLORS[0][2], CMY_COLORS[0][3] }
+	};
 	Uint8* color = NORMALS;
 	int size_x, size_y;
 	double* zBuffer;
@@ -463,16 +467,14 @@ private:
 				texture[i] = bitmapToTexture(texture_file, size[i][0], size[i][1]);
 			}
 		}
-		void draw(Scene scene, Uint32* frame, int frame_width, int frame_height) {
+		void draw(Scene scene, Uint32* frame, int frame_width, int frame_height) 
+		{		
 			//test if there is an active camera
 			if (scene.activeCam() != -1) {
 				memset(zBuffer, 0, size_x * size_y * sizeof(double));
 				vec2 center = vec2(frame_width / 2, frame_height / 2);
 				camera cam = scene.getActiveCam();
-				//Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 };
-
 				//draw all objects in the scene
-
 				//animation stuff
 				currentTime = Clock::now();
 				chrono::duration<double> time_span = currentTime - lastTime;
@@ -481,9 +483,8 @@ private:
 					current_texture++;
 				}
 				int t = current_texture % number_of_textures;
-
+				
 				for (object o : scene.getObjects()) {
-
 					//draw all faces
 					for (int i = 0; i < o.faces.size(); i++) {
 						vector<int> f = o.faces.at(i);
@@ -507,7 +508,7 @@ private:
 								angle1 = (o.normals.at(o.vertex_normals.at(i).at(0) - 1).angle(light_vector1)) / 180,
 								angle2 = (o.normals.at(o.vertex_normals.at(i).at(1) - 1).angle(light_vector2)) / 180,
 								angle3 = (o.normals.at(o.vertex_normals.at(i).at(2) - 1).angle(light_vector3)) / 180
-								;
+							;
 							vector<double> angles = { angle1,angle2,angle3 };
 							//compute color of every vertex
 							/*
@@ -516,30 +517,25 @@ private:
 								{color[0] * angle2, color[1] * angle2, color[2] * angle2, color[3] * angle2},
 								{color[0] * angle3, color[1] * angle3, color[2] * angle3, color[3] * angle3}
 							};
-							*/
-							Uint8 colors[3][4] = {
-								{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
-								{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
-								{ CMY_COLORS[0][0], CMY_COLORS[0][1], CMY_COLORS[0][2], CMY_COLORS[0][3] }
-							};
-							
+							*/							
 							//get uv coordinates of every vertex
 							vector<vec2> uvs = {
 								o.uv_texture_coordinates.at(o.uv.at(i).at(0) - 1),
 								o.uv_texture_coordinates.at(o.uv.at(i).at(1) - 1),
 								o.uv_texture_coordinates.at(o.uv.at(i).at(2) - 1)
 							};
+							
 							//get the z component of every vertex (for perspective correct interpolation)
 							vector<double> z = {
 								(project_w(o.vertices.at(f.at(0) - 1), cam, scene.getAxes())).getZ(),
 								(project_w(o.vertices.at(f.at(1) - 1), cam, scene.getAxes())).getZ(),
 								(project_w(o.vertices.at(f.at(2) - 1), cam, scene.getAxes())).getZ()
 							};
-
+							
 							//draw the face
-							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
+							drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
 							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							fillFace(frame, frame_width, frame_height, points, colors, z);
+							//fillFace(frame, frame_width, frame_height, points, colors, z);
 							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*
@@ -568,7 +564,7 @@ private:
 					}
 					*/
 				}
-
+				
 				//draws texture into top left corner of screen
 				/*
 				for (int x = 0; x < size_x; x++)
@@ -640,5 +636,6 @@ private:
 					}
 					*/
 			}
+			
 		}
 };
