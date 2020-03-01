@@ -30,7 +30,7 @@ private:
 	size_x is the width of the frame (pixel array)
 	size_y is the height of the frame (pixel array)
 	*/
-	static void drawLine(Uint8* color, Uint32* pixels, int size_x, int size_y, vec2 p1, vec2 p2) {
+	void drawLine(Uint8* color, Uint32* pixels, vec2 p1, vec2 p2) {
 		int y, x;
 		float k = (p1.getY() - p2.getY()) / (p1.getX() - p2.getX());
 		Uint32 color_int = color[0] * 256 * 256 * 256 + color[1] * 256 * 256 + color[2] * 256 + color[3];
@@ -109,8 +109,8 @@ private:
 	void drawFace(Uint8* color, Uint32* pixels, int size_x, int size_y, vector<vec2> points)
 	{
 		for (int i = 0; i < points.size() - 1; i++)
-			drawLine(color, pixels, size_x, size_y, points.at(i), points.at(i + 1));
-		drawLine(color, pixels, size_x, size_y, points.at(0), points.at(points.size() - 1));
+			drawLine(color, pixels, points.at(i), points.at(i + 1));
+		drawLine(color, pixels, points.at(0), points.at(points.size() - 1));
 	}
 	/*
 	draws a circle ... its simple ...
@@ -276,11 +276,11 @@ private:
 						;
 
 					//interpolate 1/z
-					double w = 1 / ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
+					double w = ((1 / z.at(0)) * w_v1 + (1 / z.at(1)) * w_v2 + (1 / z.at(2)) * w_v3);
 					//calculation of uv coordinates
 					double
-						u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * w,
-						v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * w
+						u1 = (uv_1.getX() * w_v1 + uv_2.getX() * w_v2 + uv_3.getX() * w_v3) * 1 / w,
+						v1 = (uv_1.getY() * w_v1 + uv_2.getY() * w_v2 + uv_3.getY() * w_v3) * 1 / w
 						;
 
 					int
@@ -295,8 +295,11 @@ private:
 						(texture[v * size_x_texture + u] & 0x0000FF00) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3),
 						(texture[v * size_x_texture + u] & 0x000000FF) * (vertex_normal_angle.at(0) * w_v1 + vertex_normal_angle.at(1) * w_v2 + vertex_normal_angle.at(2) * w_v3)
 					};
-					//if((color[0] & 0xFF000000) != 0x0)
+					if (zBuffer[y * size_x + x] < w)
+					{
+						zBuffer[y * size_x + x] = w;
 						pixels[y * size_x + x] = (color[0] & 0xFF000000) | (color[1] & 0x00FF0000) | (color[2] & 0x0000FF00) | (color[3] & 0x000000FF);
+					}
 				}
 		}
 		delete[] buffer;
