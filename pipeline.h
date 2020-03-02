@@ -533,12 +533,12 @@ private:
 							};
 							
 							//draw the face
-							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
+							drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
 							//if(!o.culling)
 							//	fillFace(OUTLINE, frame, frame_width, frame_height, points);
 								//drawFace(OUTLINE, frame, frame_width, frame_height, points);
 							//else
-								fillFace(frame, frame_width, frame_height, points, colors, z);
+							//	fillFace(frame, frame_width, frame_height, points, colors, z);
 								//fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*

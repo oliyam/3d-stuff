@@ -56,7 +56,7 @@ int main(int argc, char* args[])
 	bool leftMouseButtonDown = false;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "tomato";
+	string pictures = "globe";
 	int number = 1;
 
 	Scene scene = Scene();
@@ -182,7 +182,7 @@ int main(int argc, char* args[])
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 						pixels[y * SCREEN_WIDTH + x] = 0 * 256 * 256 * 256 + 70 * 256 * 256 + 70 * 256 + 70;
 				*/
-				/*
+				
 				//cool gradient
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
@@ -191,7 +191,7 @@ int main(int argc, char* args[])
 						//Uint8 a = 0, r =255, g = 255, b = 255;
 						pixels[y * SCREEN_WIDTH + x] = a * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b;
 					}
-				*/
+				
 				//draw the spinning line thingy
 				//memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				//pixels = drawLine(GREEN, pixels, SCREEN_WIDTH, vec2(SCREEN_WIDTH / 2 + cos(angle * 3.14 / 180)*10, SCREEN_HEIGHT / 2 + sin(angle * 3.14 / 180) * 10), vec2(SCREEN_WIDTH/2+cos(angle * 3.14 / 180)* SCREEN_HEIGHT / 2, SCREEN_HEIGHT/2+sin(angle * 3.14 / 180)* SCREEN_HEIGHT / 2));
