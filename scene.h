@@ -107,9 +107,9 @@ class Scene {
 
 		Scene() 
 		{
-			for (int i = 1; i <= 2; i++)
+			for (int i = 1; i <= 1; i++)
 				objects.push_back(object("test.obj", "test_smooth.obj", true));
-			//objects.push_back(object("triangle.obj","triangle_smooth.obj", false));
+			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("torus.obj", "torus_smooth.obj", false));

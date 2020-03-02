@@ -113,7 +113,7 @@ private:
 		drawLine(color, pixels, points.at(0), points.at(points.size() - 1));
 	}
 	/*
-	draws a circle ... its simple ...
+	draws a circle ... not ... its simple ...
 	*/
 	void drawCircle(Uint8* color, Uint32* pixels, int size_x, int size_y, int radius, int pos_x, int pos_y)
 	{
@@ -488,7 +488,7 @@ private:
 					//draw all faces
 					for (int i = 0; i < o.faces.size(); i++) {
 						vector<int> f = o.faces.at(i);
-						if (0 < o.face_normals.at(i) * (cam.getPos() - o.vertices.at(f.at(0) - 1)))
+						//if (0 < o.face_normals.at(i) * (cam.getPos() - o.vertices.at(f.at(0) - 1)))
 						{
 							vector<vec2> points;
 							for (int v = 0; v < f.size(); v++) {
@@ -533,10 +533,13 @@ private:
 							};
 							
 							//draw the face
-							drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
-							//drawFace(OUTLINE, frame, frame_width, frame_height, points);
-							//fillFace(frame, frame_width, frame_height, points, colors, z);
-							//fillFace(OUTLINE, frame, frame_width, frame_height, points);
+							//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
+							//if(!o.culling)
+							//	fillFace(OUTLINE, frame, frame_width, frame_height, points);
+								//drawFace(OUTLINE, frame, frame_width, frame_height, points);
+							//else
+								fillFace(frame, frame_width, frame_height, points, colors, z);
+								//fillFace(OUTLINE, frame, frame_width, frame_height, points);
 		
 							/*
 							//draw normals

@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: ''
 # www.blender.org
-mtllib grid.mtl
+mtllib grid_smooth.mtl
 o Grid
 v -26.480591 0.000000 26.480591
 v -20.596016 0.000000 26.480591
