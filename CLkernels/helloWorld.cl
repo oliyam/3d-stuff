@@ -33,7 +33,7 @@ __kernel void ProcessArray
 	
 	//pixels[y * size_x + x]=255*255*255*255;
 	
-	int 
+	double 
 		e1 = (x - v0x) * (v1y - v0y) - (y - v0y) * (v1x - v0x),
 		e2 = (x - v1x) * (v2y - v1y) - (y - v1y) * (v2x - v1x),
 		e3 = (x - v2x) * (v0y - v2y) - (y - v2y) * (v0x - v2x)

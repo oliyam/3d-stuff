@@ -107,8 +107,8 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "test";
-			for (int i = 0; i <10; i++)
+			string obj = "chest";
+			for (int i = 0; i < 1; i++)
 				objects.push_back(object(obj+".obj", obj+"_smooth.obj", true));
 				
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
