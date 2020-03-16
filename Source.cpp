@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 3;
+double multiplikator = 5;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -51,7 +51,7 @@ int main(int argc, char* args[])
 
 	SDL_Window* window = SDL_CreateWindow("3D Stuff yo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);// SDL_RENDERER_ACCELERATED);
-	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STATIC, SCREEN_WIDTH, SCREEN_HEIGHT);
+	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	bool leftMouseButtonDown = false;
 	bool hidden = false;
@@ -176,13 +176,13 @@ int main(int argc, char* args[])
 			}
 
 			if (!hidden && !stop) {
-				memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));	
+				//memset(pixels, -1, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				/*
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 						pixels[y * SCREEN_WIDTH + x] = 0 * 256 * 256 * 256 + 70 * 256 * 256 + 70 * 256 + 70;
 				*/
-				
+				/*
 				//cool gradient
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
@@ -191,18 +191,20 @@ int main(int argc, char* args[])
 						//Uint8 a = 0, r =255, g = 255, b = 255;
 						pixels[y * SCREEN_WIDTH + x] = a * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b;
 					}
-				
+				*/
 				//draw the spinning line thingy
 				//memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				//pixels = drawLine(GREEN, pixels, SCREEN_WIDTH, vec2(SCREEN_WIDTH / 2 + cos(angle * 3.14 / 180)*10, SCREEN_HEIGHT / 2 + sin(angle * 3.14 / 180) * 10), vec2(SCREEN_WIDTH/2+cos(angle * 3.14 / 180)* SCREEN_HEIGHT / 2, SCREEN_HEIGHT/2+sin(angle * 3.14 / 180)* SCREEN_HEIGHT / 2));
 				//angle++;
+				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
 				pipe.draw(scene, pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
-
+				
 				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
 				SDL_RenderClear(renderer);
 				SDL_RenderCopy(renderer, texture, NULL, NULL);
 				SDL_RenderPresent(renderer);
+			
 			}
 			
 
