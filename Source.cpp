@@ -56,7 +56,7 @@ int main(int argc, char* args[])
 	bool leftMouseButtonDown = false;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "chest";
+	string pictures = "globe";
 	int number = 1;
 
 	Scene scene = Scene();
