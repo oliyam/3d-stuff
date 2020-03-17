@@ -421,9 +421,10 @@ private:
 	vector<int> vec;
 	CommandQueue queue;
 	Kernel kernel;
-	Buffer cl_pixels, cl_texture, cl_zBuffer;
+	Buffer cl_pixels, cl_texture, cl_zBuffer, cl_points, cl_uvs;
 	Kernel yeet;
-
+	vector<double> triangle_points;
+	vector<double> triangle_uvs;
 
 	public:
 		//constructor
@@ -456,7 +457,7 @@ private:
 			yeet.setArg(0, cl_pixels);
 			yeet.setArg(2, (cl_int)x);
 			yeet.setArg(3, (cl_int)y);
-			yeet.setArg(21, cl_zBuffer);
+			yeet.setArg(6, cl_zBuffer);
 
 			//queue.enqueueWriteBuffer(cl_pixels, CL_TRUE, 0, sizeof(Uint32) * frame_width * frame_height, frame);
 
@@ -495,7 +496,8 @@ private:
 		}
 		void draw(Scene scene, Uint32* frame, int frame_width, int frame_height)
 		{
-			queue.enqueueReadBuffer(cl_pixels, CL_TRUE, 0, sizeof(Uint32)* frame_width* frame_height, frame);
+			triangle_points.clear();
+			triangle_uvs.clear();
 			queue.enqueueFillBuffer(cl_pixels, 0, 0, sizeof(Uint32) * frame_width * frame_height, NULL, 0);
 			if(1)
 			{
@@ -524,9 +526,16 @@ private:
 								vector<vec2> points;
 								for (int v = 0; v < f.size(); v++) {
 									//push vertex coordinates into point array
-									points.push_back(project(o.vertices.at(f.at(v) - 1), cam, scene.getAxes()) * vec2(frame_width / cam.getViewX(), frame_height / cam.getViewY()) + center);
+									triangle_points.push_back((project(o.vertices.at(f.at(v) - 1), cam, scene.getAxes()) * vec2(frame_width / cam.getViewX(), frame_height / cam.getViewY()) + center).getX());
+									triangle_points.push_back((project(o.vertices.at(f.at(v) - 1), cam, scene.getAxes()) * vec2(frame_width / cam.getViewX(), frame_height / cam.getViewY()) + center).getY());
+									triangle_points.push_back((project_w(o.vertices.at(f.at(v) - 1), cam, scene.getAxes())).getZ());
 								}
-								
+								for (int v = 0; v < f.size(); v++) {
+									//push vertex uvs into point array
+									triangle_uvs.push_back(o.uv_texture_coordinates.at(o.uv.at(i).at(v) - 1).getX());
+									triangle_uvs.push_back(o.uv_texture_coordinates.at(o.uv.at(i).at(v) - 1).getY());
+								}
+								/*
 								vec3
 									light_vector1 = o.vertices.at(f.at(0) - 1) - scene.getLights().at(0).point,
 									light_vector2 = o.vertices.at(f.at(1) - 1) - scene.getLights().at(0).point,
@@ -551,19 +560,24 @@ private:
 									{color[0] * angle2, color[1] * angle2, color[2] * angle2, color[3] * angle2},
 									{color[0] * angle3, color[1] * angle3, color[2] * angle3, color[3] * angle3}
 								};
-								
+								*/
+								/*
 								//get uv coordinates of every vertex
 								vector<vec2> uvs = {
 									o.uv_texture_coordinates.at(o.uv.at(i).at(0) - 1),
 									o.uv_texture_coordinates.at(o.uv.at(i).at(1) - 1),
 									o.uv_texture_coordinates.at(o.uv.at(i).at(2) - 1)
-								};							
+								};		
+								*/
+								/*
 								//get the z component of every vertex (for perspective correct interpolation)
 								vector<double> z = {
 									(project_w(o.vertices.at(f.at(0) - 1), cam, scene.getAxes())).getZ(),
 									(project_w(o.vertices.at(f.at(1) - 1), cam, scene.getAxes())).getZ(),
 									(project_w(o.vertices.at(f.at(2) - 1), cam, scene.getAxes())).getZ()
 								};
+								*/
+								/*
 								for (int p = 0; p < points.size(); p++) {
 									yeet.setArg(6 + 5 * p, (cl_double)points.at(p).getX());
 									yeet.setArg(6 + 5 * p + 1, (cl_double)points.at(p).getY());
@@ -579,7 +593,8 @@ private:
 								;
 								yeet.setArg(22, (cl_int)min_x);
 								yeet.setArg(23, (cl_int)min_y);
-								queue.enqueueNDRangeKernel(yeet, NullRange, NDRange(max_x-min_x,max_y-min_y), NullRange);
+								*/
+								//queue.enqueueNDRangeKernel(yeet, NullRange, NDRange(max_x-min_x,max_y-min_y), NullRange);
 								//queue.enqueueReadBuffer(cl_pixels, CL_TRUE, 0, sizeof(Uint32) * frame_width * frame_height, frame);
 								//draw the face
 								//drawTextureToFace(frame, frame_width, frame_height, points, uvs, z, 1, 1, texture[t], size[t][0], size[t][1], angles);
@@ -691,5 +706,16 @@ private:
 						*/
 				}
 			}
+			
+			cl_points = Buffer(context, CL_MEM_READ_WRITE, sizeof(double) * triangle_points.size());
+			queue.enqueueWriteBuffer(cl_points, CL_TRUE, 0, sizeof(double)* triangle_points.size(), triangle_points.data());
+			cl_uvs= Buffer(context, CL_MEM_READ_WRITE, sizeof(double) * triangle_uvs.size());
+			queue.enqueueWriteBuffer(cl_uvs, CL_TRUE, 0, sizeof(double)* triangle_uvs.size(), triangle_uvs.data());
+			yeet.setArg(7, cl_points);
+			yeet.setArg(8, cl_uvs);
+			//cout<< triangle_points.size() / 9 <<endl;
+			queue.enqueueNDRangeKernel(yeet, NullRange, NDRange(triangle_points.size()/9, frame_width, frame_height), NullRange);
+			queue.enqueueReadBuffer(cl_pixels, CL_TRUE, 0, sizeof(Uint32)* frame_width* frame_height, frame);
+				
 		}
 };

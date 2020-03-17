@@ -6,32 +6,62 @@ __kernel void ProcessArray
 	int size_y,
 	int size_x_texture,
 	int size_y_texture,
-	double v0x,
-	double v0y,
-	double v0z,
-	double v0u,
-	double v0v,
-	double v1x,
-	double v1y,
-	double v1z,
-	double v1u,
-	double v1v,
-	double v2x,
-	double v2y,
-	double v2z,
-	double v2u,
-	double v2v,
 	__global double* zBuffer,
-	int offset_x,
-	int offset_y
+	__global double* points,
+	__global double* uvs
 )
 {
-	int 
-		x=get_global_id(0)+offset_x,
-		y=get_global_id(1)+offset_y
+	int triangle=get_global_id(0);
+	
+	double 
+		v0x=points[triangle*9+0],
+		v0y=points[triangle*9+1],
+		v0z=points[triangle*9+2],
+		v0u=uvs[triangle*6+0],
+		v0v=uvs[triangle*6+1],
+		v1x=points[triangle*9+3],
+		v1y=points[triangle*9+4],
+		v1z=points[triangle*9+5],
+		v1u=uvs[triangle*6+2],
+		v1v=uvs[triangle*6+3],
+		v2x=points[triangle*9+6],
+		v2y=points[triangle*9+7],
+		v2z=points[triangle*9+8],
+		v2u=uvs[triangle*6+4],
+		v2v=uvs[triangle*6+5]
 	;
 	
-	//pixels[y * size_x + x]=255*255*255*255;
+	double max_x=v0x;
+	if(max_x<v1x)
+		max_x=v1x;
+	if(max_x<v2x)
+		max_x=v2x;		
+	double max_y=v0y;
+	if(max_y<v1y)
+		max_y=v1y;
+	if(max_y<v2y)
+		max_y=v2y;
+	
+	double min_x=v0x;
+	if(min_x>v1x)
+		min_x=v1x;
+	if(min_x>v2x)
+		min_x=v2x;		
+	double min_y=v0y;
+	if(min_y>v1y)
+		min_y=v1y;
+	if(min_y>v2y)
+		min_y=v2y;
+
+	int 
+		x=get_global_id(1),
+		y=get_global_id(2)
+	;
+	
+	if(x>min_x&&x<max_x&&y>min_y&&y<max_y)
+	{	
+
+	pixels[y * size_x + x]=255*255*255*255;
 	
 	double 
 		e1 = (x - v0x) * (v1y - v0y) - (y - v0y) * (v1x - v0x),
@@ -39,7 +69,7 @@ __kernel void ProcessArray
 		e3 = (x - v2x) * (v0y - v2y) - (y - v2y) * (v0x - v2x)
 	;
 	
-	if ((e1 > 1 && e2 > 1 && e3 > 1)||(e1 == 0&& e2 > 1 && e3 > 1)||(e2 == 0&& e1 > 1 && e3 > 1)||(e3 == 0&& e2 > 1 && e1 > 1))
+	if ((e1 >= 1 && e2 >= 1 && e3 >= 1)||(e1 == 0&& e2 >= 1 && e3 >= 1)||(e2 == 0&& e1 >= 1 && e3 >= 1)||(e3 == 0&& e2 >= 1 && e1 >= 1))
 	{
 		
 		double
@@ -75,5 +105,5 @@ __kernel void ProcessArray
 			pixels[y * size_x + x] = texture[v * size_x_texture + u];
 		}
 	}
-
+	}
 }
