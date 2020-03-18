@@ -21,6 +21,11 @@ class Scene {
 		vector<camera> cameras;
 		vector<light> lights;
 
+		vector<double> triangle_vertices;
+		vector<double> triangle_vertex_normals;
+		vector<double> triangle_face_normals;
+		vector<double> triangle_uvs;
+
 		//axes (x,y,z)
 		vec3 axes[3] = { vec3(1,0,0), vec3(0,1,0), vec3(0,0,1) };
 
@@ -107,10 +112,11 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "monkee";
+			string obj = "chest";
+			string obj1 = "";
 			for (int i = 0; i < 1; i++)
 				objects.push_back(object(obj+".obj", obj+"_smooth.obj", true));
-				
+			//objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", true));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));

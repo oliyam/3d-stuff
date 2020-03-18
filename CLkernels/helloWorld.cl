@@ -39,7 +39,7 @@ __kernel void ProcessArray
 		e3 = (x - v2x) * (v0y - v2y) - (y - v2y) * (v0x - v2x)
 	;
 	
-	if ((e1 > 1 && e2 > 1 && e3 > 1)||(e1 == 0&& e2 > 1 && e3 > 1)||(e2 == 0&& e1 > 1 && e3 > 1)||(e3 == 0&& e2 > 1 && e1 > 1))
+	if (e1 >= 0 && e2 >= 0 && e3 >= 0)
 	{
 		
 		double
@@ -74,6 +74,7 @@ __kernel void ProcessArray
 			zBuffer[y * size_x + x] = w;
 			pixels[y * size_x + x] = texture[v * size_x_texture + u];
 		}
+		//pixels[y * size_x + x]=255*255*255*255;
 	}
 
 }

@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 5;
+double multiplikator = 4;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -56,7 +56,7 @@ int main(int argc, char* args[])
 	bool leftMouseButtonDown = false;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "globe";
+	string pictures = "chest";
 	int number = 1;
 
 	Scene scene = Scene();
