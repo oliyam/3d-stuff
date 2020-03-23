@@ -21,11 +21,6 @@ class Scene {
 		vector<camera> cameras;
 		vector<light> lights;
 
-		vector<double> triangle_vertices;
-		vector<double> triangle_vertex_normals;
-		vector<double> triangle_face_normals;
-		vector<double> triangle_uvs;
-
 		//axes (x,y,z)
 		vec3 axes[3] = { vec3(1,0,0), vec3(0,1,0), vec3(0,0,1) };
 
@@ -43,6 +38,11 @@ class Scene {
 		}
 
 	public:
+		vector<double> triangle_vertices;
+		vector<double> triangle_vertex_normals;
+		vector<double> triangle_face_normals;
+		vector<double> triangle_uvs;
+
 		void rotate(int index, int axis, float angle)
 		{objects.at(index).rotateObj(axis, angle);}
 
@@ -112,7 +112,7 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "chest";
+			string obj = "torus";
 			string obj1 = "";
 			for (int i = 0; i < 1; i++)
 				objects.push_back(object(obj+".obj", obj+"_smooth.obj", true));
@@ -122,7 +122,7 @@ class Scene {
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("torus.obj", "torus_smooth.obj", false));
 			for(int i=1;i<=3;i++)
-				cameras.push_back(camera(vec3(i * -10, i * -10, i * -10), vec3(30, -45, 0), 10));
+				cameras.push_back(camera(vec3(i * -5, i * -5, i * -5), vec3(30, -45, 0), 10));
 			lights.push_back(light(vec3(0,0,-10)));
 			cameras.push_back(camera(vec3(0, 0, -10), vec3(0, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 0, 10), vec3(180, 0, 180), 10));
@@ -130,5 +130,21 @@ class Scene {
 			cameras.push_back(camera(vec3(-10, 0, 0), vec3(0, -90, 0), 10));
 			cameras.push_back(camera(vec3(0, -10, 0), vec3(90, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 10, 0), vec3(-90, 0, 0), 10));		
+			for (object o:objects)
+			{
+				for(vector<int> f:o.faces)
+					for (int p : f)
+					{
+						triangle_vertices.push_back(o.vertices.at(p-1).getX());
+						triangle_vertices.push_back(o.vertices.at(p-1).getY());
+						triangle_vertices.push_back(o.vertices.at(p-1).getZ());
+					}
+				for (vector<int> f : o.uv)
+					for (int p : f)
+					{
+						triangle_vertices.push_back(o.uv_texture_coordinates.at(p - 1).getX());
+						triangle_vertices.push_back(o.uv_texture_coordinates.at(p - 1).getY());
+					}
+			}
 		}
 };

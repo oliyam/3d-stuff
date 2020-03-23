@@ -1,37 +1,42 @@
-__kernel void ProcessArray
+__kernel void Rasterize
 (
 	__global int* pixels,
 	__global int* texture,
+	__global double* points,
+	__global double* uvs,
+	__global double* zBuffer,
 	int size_x,
 	int size_y,
 	int size_x_texture,
-	int size_y_texture,
-	double v0x,
-	double v0y,
-	double v0z,
-	double v0u,
-	double v0v,
-	double v1x,
-	double v1y,
-	double v1z,
-	double v1u,
-	double v1v,
-	double v2x,
-	double v2y,
-	double v2z,
-	double v2u,
-	double v2v,
-	__global double* zBuffer,
-	int offset_x,
-	int offset_y
+	int size_y_texture
 )
 {
-	int 
-		x=get_global_id(0)+offset_x,
-		y=get_global_id(1)+offset_y
+	int t=0;
+	
+	double
+		v0x=points[t*9+0],
+		v0y=points[t*9+1],
+		v0z=points[t*9+2],
+		v0u=uvs[t*6+0],
+		v0v=uvs[t*6+1],
+		v1x=points[t*9+3],
+		v1y=points[t*9+4],
+		v1z=points[t*9+5],
+		v1u=uvs[t*6+2],
+		v1v=uvs[t*6+3],
+		v2x=points[t*9+6],
+		v2y=points[t*9+7],
+		v2z=points[t*9+8],
+		v2u=uvs[t*6+4],
+		v2v=uvs[t*6+5]
 	;
 	
-	//pixels[y * size_x + x]=255*255*255*255;
+	int
+		x=get_global_id(0),
+		y=get_global_id(1)
+	;
+	
+	pixels[y * size_x + x]=255*255*255*255;
 	
 	double 
 		e1 = (x - v0x) * (v1y - v0y) - (y - v0y) * (v1x - v0x),
@@ -74,7 +79,15 @@ __kernel void ProcessArray
 			zBuffer[y * size_x + x] = w;
 			pixels[y * size_x + x] = texture[v * size_x_texture + u];
 		}
-		//pixels[y * size_x + x]=255*255*255*255;
+		pixels[y * size_x + x]=255*255*255*255;
 	}
 
+}
+
+void print(){
+	printf("yeet");
+}
+
+__kernel void test(){
+	print();
 }

@@ -139,22 +139,22 @@ int main(int argc, char* args[])
 					scene.setObj(0, object("test.obj", "test_smooth.obj", true));
 					break;
 				case SDLK_a:
-					scene.rotate(0, 0, 3);
+					scene.rotate(0, 0, 10);
 					break;
 				case SDLK_s:
-					scene.rotate(0, 1, 3);
+					scene.rotate(0, 1, 10);
 					break;
 				case SDLK_q:
-					scene.rotate(0, 2, 3);
+					scene.rotate(0, 2, 10);
 					break;
 				case SDLK_d:
-					scene.rotate(0, 0, -3);
+					scene.rotate(0, 0, -10);
 					break;
 				case SDLK_w:
-					scene.rotate(0, 1, -3);
+					scene.rotate(0, 1, -10);
 					break;
 				case SDLK_e:
-					scene.rotate(0, 2, -3);
+					scene.rotate(0, 2, -10);
 					break;
 				case SDLK_LSHIFT:
 					ShowConsole();
@@ -198,13 +198,13 @@ int main(int argc, char* args[])
 				//angle++;
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
-				pipe.draw(scene, pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
+				//pipe.draw(scene, pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
 				
 				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
 				SDL_RenderClear(renderer);
 				SDL_RenderCopy(renderer, texture, NULL, NULL);
 				SDL_RenderPresent(renderer);
-			
+				
 			}
 			
 
