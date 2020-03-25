@@ -6,7 +6,7 @@
 #include <iostream>  
 #include <fstream>  
 #include <vector>
-//#include <bitset>
+#include <bitset>
 
 #include <ctime>
 #include <chrono>
@@ -30,8 +30,56 @@ private:
 	size_x is the width of the frame (pixel array)
 	size_y is the height of the frame (pixel array)
 	*/
+	void drawLine(Uint32 color_int, double x1, double y1, double x2, double y2) {
+		int y, x;
+		float k = (y1 - y2) / (x1 - x2);
+		if (abs(x1 - x2) > abs(y1 - y2))
+		{
+			if (x1 < x2) {
+				swap(x1, x2);
+				swap(y1, y2);
+			}
+			if (x2 < 0)
+				x2 = 0;
+			for (int x = x2; x < size_x && x < x1; x++)
+			{
+				y = k * (x - x1) + y1;
+				if (y >= 0 && y < size_y)
+					pixels[y * size_x + x] = color_int;
+			}
+		}
+		else
+		{
+			if (y1 < y2) {
+				swap(x1, x2);
+				swap(y1, y2);
+			}
+			if (y2 < 0)
+				y2 = 0;
+			for (int y = y2; y < size_y && y < y1; y++)
+			{
+				x = (y - y1) / k + x1;
+				if (x >= 0 && x < size_x)
+					pixels[y * size_x + x] = color_int;
+			}
+		}
+	}
+	/*
+	draws a face ... its simple ...
+	*/
+	void drawFace(Uint32 color, double points[])
+	{
+		drawLine(color, points[0], points[1], points[3], points[4]);
+		drawLine(color, points[3], points[4], points[6], points[7]);
+		drawLine(color, points[6], points[7], points[0], points[1]);
+	}
+	/*
+	draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
+	size_x is the width of the frame (pixel array)
+	size_y is the height of the frame (pixel array)
+	*/
 	void drawLine(Uint8* color, Uint32* pixels, vec2 p1, vec2 p2) {
-		//int y, x;
+		int y, x;
 		float k = (p1.getY() - p2.getY()) / (p1.getX() - p2.getX());
 		Uint32 color_int = color[0] * 256 * 256 * 256 + color[1] * 256 * 256 + color[2] * 256 + color[3];
 		if (abs(p1.getX() - p2.getX()) > abs(p1.getY() - p2.getY()))
@@ -42,7 +90,7 @@ private:
 				p2.setX(0);
 			for (int x = p2.getX(); x < size_x && x < p1.getX(); x++)
 			{
-				int y = k * (x - p1.getX()) + p1.getY();
+				y = k * (x - p1.getX()) + p1.getY();
 				if (y >= 0 && y < size_y)
 					pixels[y * size_x + x] = color_int;
 			}
@@ -55,7 +103,7 @@ private:
 				p2.setY(0);
 			for (int y = p2.getY(); y < size_y && y < p1.getY(); y++)
 			{
-				int x = (y - p1.getY()) / k + p1.getX();
+				x = (y - p1.getY()) / k + p1.getX();
 				if (x >= 0 && x < size_x)
 					pixels[y * size_x + x] = color_int;
 			}
@@ -95,22 +143,6 @@ private:
 		}
 	}
 	/*
-	draws a triangle
-	*/
-	void drawTriangle(Uint8* color, Uint32* pixels, int size_x, int size_y, vector<vec2> points) {
-		Uint32 color_int = color[0] * 256 * 256 * 256 + color[1] * 256 * 256 + color[2] * 256 + color[3];
-		for (int x = 0; x < size_x; x++)
-			for (int y = 0; y < size_y; y++)
-			{
-				double e1 = (x - points.at(0).getX()) * (points.at(1).getY() - points.at(0).getY()) - (y - points.at(0).getY()) * (points.at(1).getX() - points.at(0).getX());
-				double e2 = (x - points.at(1).getX()) * (points.at(2).getY() - points.at(1).getY()) - (y - points.at(1).getY()) * (points.at(2).getX() - points.at(1).getX());
-				double e3 = (x - points.at(2).getX()) * (points.at(0).getY() - points.at(2).getY()) - (y - points.at(2).getY()) * (points.at(0).getX() - points.at(2).getX());
-
-				if (e1 >= 1 && e2 >= 1 && e3 >= 1)
-					pixels[y * size_x + x] = color_int;
-			}
-	}
-	/*
 	checks if p3 is on the line between p1 and p2
 	*/
 	bool pointOnLine(vec2 p1, vec2 p2, vec2 p3)
@@ -122,7 +154,7 @@ private:
 	/*
 	draws a face ... its simple ...
 	*/
-	void drawFace(Uint8* color, Uint32* pixels, int size_x, int size_y, vector<vec2> points)
+	void drawFace(Uint8* color, Uint32* &pixels, vector<vec2> points)
 	{
 		for (int i = 0; i < points.size() - 1; i++)
 			drawLine(color, pixels, points.at(i), points.at(i + 1));
@@ -170,7 +202,7 @@ private:
 		delete[] buffer;
 	}
 	/*
-	fills a face ... with interpolation stuff
+	fills a face ... with interpolation stuff going on
 	*/
 	void fillFace(Uint32* pixels, int size_x, int size_y, vector<vec2> points, Uint8 color[3][4], vector<double> z)
 	{
@@ -239,7 +271,7 @@ private:
 		delete[] buffer;
 	}
 	/*
-	draws texture to face ... with interpolation stuff
+	draws texture to face ... with interpolation stuff going on
 	*/
 	void drawTextureToFace(Uint32* pixels, int size_x, int size_y, vector<vec2> points, vector<vec2> uv_coords, vector<double> z, int texture_multiplier_x, int texture_multiplier_y, Uint32* texture, int size_x_texture, int size_y_texture, vector<double> vertex_normal_angle)
 	{
@@ -300,7 +332,7 @@ private:
 
 					int
 						u = abs((int)((u1 * size_x_texture) * texture_multiplier_x) % (size_x_texture)),
-						v = abs((int)((v1 * size_y_texture) * texture_multiplier_y) % (size_y_texture))
+						v = abs(((int)(v1 * size_y_texture) * texture_multiplier_y) % (size_y_texture))
 						;
 					//cout << "u: "<< u << "; v:" << v << endl;
 					//calculation of all color channels (argb)
@@ -403,7 +435,9 @@ private:
 	int number_of_textures;
 	int** size;
 	Uint32** texture;
+	Uint32* pixels;
 	Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 }, OUTLINE[4] = { 0,255,165,0 };
+	Uint32 orange = OUTLINE[0] * 256 * 256 * 256 + OUTLINE[1] * 256 * 256 + OUTLINE[2] * 256 + OUTLINE[3];
 	Uint8 colors[3][4] = {
 					{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
 					{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
@@ -414,41 +448,49 @@ private:
 	double* zBuffer;
 
 	//opencl attributes
-	Program program;
+	Program halloWelt;
 	Context context;
 	Buffer outBuf, inBuf;
 	Device device;
 	vector<int> vec;
 	CommandQueue queue;
 	Kernel kernel;
-	Buffer cl_pixels, cl_texture, cl_zBuffer, cl_points, cl_uvs;
-	Kernel project_points, rasterize;
-
 
 public:
 	//constructor
-	Pipeline(string path, int number, int x, int y) {
+	Pipeline(string path, int number, int x, int y, Uint32* lel) {
+		pixels = lel;
 		size_x = x;
 		size_y = y;
 		zBuffer = new double[x * y];
 		memset(zBuffer, 0, x * y * sizeof(double));
-
+		/*
 		//OpenCL stuff
-		program = getProgram("CLKernels/3dKernel.cl");
-		context = program.getInfo<CL_PROGRAM_CONTEXT>();
+		halloWelt = getProgram("CLkernels/helloWorld.cl");
+		context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
 		vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
 		device = devices.front();
 
-		//memory buffers
-		cl_pixels = Buffer(context, CL_MEM_READ_ONLY, sizeof(Uint32) * x * y);
-		cl_zBuffer = Buffer(context, CL_MEM_READ_ONLY, sizeof(double) * x * y);
 
-		//queue
+		vec = vector<int>(15);
+		fill(vec.begin(), vec.end(), 10);
+
+		//memory buffer as kernel arguments
+		inBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR, sizeof(int) * vec.size(), vec.data());
+		outBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * vec.size(), nullptr);
+		kernel = Kernel(halloWelt, "ProcessArray");
+		kernel.setArg(0, inBuf);
+		kernel.setArg(1, outBuf);
 		queue = CommandQueue(context, device);
 
-		//kernel
-		rasterize = Kernel(program, "Rasterize");
-		project_points = Kernel(program, "test");
+		//queue.enqueueFillBuffer(inBuf, 3, sizeof(int) * 10, sizeof(int)* (vec.size()-10));
+		queue.enqueueNDRangeKernel(kernel, NullRange, NDRange(vec.size()));
+		queue.enqueueReadBuffer(outBuf, CL_FALSE, 0, sizeof(int) * vec.size(), vec.data());
+		for (int i : vec)
+			cout<< i <<endl;
+		finish();
+		*/
+
 		/*
 		//generates checkerboard texture
 		memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
@@ -472,35 +514,69 @@ public:
 			size[i][1] = abs(size[i][1]);
 			texture[i] = bitmapToTexture(texture_file, size[i][0], size[i][1]);
 		}
-		cl_texture = Buffer(context, CL_MEM_READ_ONLY, sizeof(Uint32) * size[0][0] * size[0][1]);
-		queue.enqueueWriteBuffer(cl_texture, CL_TRUE, 0, sizeof(Uint32) * size[0][0] * size[0][1], texture[0]);
-
-		rasterize.setArg(0, cl_pixels);
-		rasterize.setArg(1, cl_texture);
-		rasterize.setArg(4, cl_zBuffer);
-		rasterize.setArg(5, (cl_int)x);
-		rasterize.setArg(6, (cl_int)y);
-		rasterize.setArg(7, (cl_int)size[0][0]);
-		rasterize.setArg(8, (cl_int)size[0][1]);
 	}
-	void draw(Scene scene, Uint32* frame, int frame_width, int frame_height)
+	void draw(Scene& scene)
 	{
-	
-		queue.enqueueFillBuffer(cl_pixels, 0, 0, sizeof(Uint32) * frame_width * frame_height, NULL, 0);
-		queue.enqueueFillBuffer(cl_zBuffer, 0, 0, sizeof(double) * frame_width * frame_height, NULL, 0);
-	
-		vector<double> triangle_vertices=scene.triangle_vertices;
-		vector<double> triangle_uvs=scene.triangle_uvs;
+		//scene.getObject(0).getName();
+		//test if there is an active camera
+		if (scene.activeCam() != -1) {
+			memset(zBuffer, 0, size_x * size_y * sizeof(double));
+			int center_x = size_x / 2;
+			int center_y = size_y / 2;
+			camera cam = scene.getActiveCam();
+			double x = cam.getPos().getX();
+			double y = cam.getPos().getY();
+			double z = cam.getPos().getZ();
+			vec3 pos = cam.getPos();
+			int cam_x = size_x / cam.getViewX();
+			int cam_y = size_y / cam.getViewY();
+			//draw all objects in the scene
+			//animation stuff
 
-		cl_points = Buffer(context, CL_MEM_READ_ONLY, sizeof(double) * triangle_vertices.size());
-		queue.enqueueWriteBuffer(cl_points, CL_TRUE, 0, sizeof(double) * triangle_vertices.size(), triangle_vertices.data());
-		cl_uvs = Buffer(context, CL_MEM_READ_ONLY, sizeof(double) * triangle_vertices.size());
-		queue.enqueueWriteBuffer(cl_uvs, CL_TRUE, 0, sizeof(double) * triangle_uvs.size(), triangle_uvs.data());
+			currentTime = Clock::now();
+			chrono::duration<double> time_span = currentTime - lastTime;
+			if (time_span.count() >= interval) {
+				lastTime = Clock::now();
+				current_texture++;
+			}
+			int t = current_texture % number_of_textures;
 
-		rasterize.setArg(2, cl_points);
-		rasterize.setArg(3, cl_uvs);
-		for (int i = 0; i < 100; i++)
-			queue.enqueueNDRangeKernel(rasterize, NullRange,  NDRange(frame_width, frame_height), NullRange);
-		queue.enqueueReadBuffer(cl_pixels, CL_TRUE, 0, sizeof(Uint32) * frame_width * frame_height, frame);
+			int max = scene.getObjectNumber();
+			for (int o = 0; o < max; o++) {
+				int max = scene.getFaceNumber(o);
+				for (int f = 0; f < max; f++) {
+					object& obj = scene.getObject(o);
+			
+					vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
+					
+					if (0 < obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1)))
+					{
+						double points[9];
+						points[2] = point0.getZ();
+						if (points[2] < 1)
+							points[2] = 1;
+						points[0] = (point0.getX() / points[2]) * cam_x + center_x;
+						points[1] = (point0.getY() / points[2]) * cam_y + center_y;
+
+						vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
+						points[5] = point1.getZ();
+						if (points[5] < 1)
+							points[5] = 1;
+						points[3] = (point1.getX() / points[5]) * cam_x + center_x;
+						points[4] = (point1.getY() / points[5]) * cam_y + center_y;
+
+						vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
+						points[8] = point2.getZ();
+						if (points[8] < 1)
+							points[8] = 1;
+						points[6] = (point2.getX() / points[8]) * cam_x + center_x;
+						points[7] = (point2.getY() / points[8]) * cam_y + center_y;
+
+						drawFace(orange, points);
+
+					}
+				}
+			}
+		}
 	}
 };

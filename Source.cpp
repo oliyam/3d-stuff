@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 4;
+double multiplikator = 6;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -42,7 +42,7 @@ int main(int argc, char* args[])
 	bool stop = false;
 	int frame = 0;
 	double angle = 0;
-	int shift = 8;
+	int shift = 0;
 	bool quit = false;
 	SDL_Event event;
 
@@ -56,11 +56,8 @@ int main(int argc, char* args[])
 	bool leftMouseButtonDown = false;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "chest";
+	string pictures = "spyro";
 	int number = 1;
-
-	Scene scene = Scene();
-	Pipeline pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT);
 
 	//declare pixel array accommodating all pixels on the screen
 	Uint32* pixels = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT];
@@ -68,6 +65,9 @@ int main(int argc, char* args[])
 	//initializing every pixel to be 0 (black)
 	//memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 	//memset(pixels_background, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
+
+	Scene scene = Scene();
+	Pipeline pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 
 	int mouseX, mouseY;
 	Uint8 GREEN[4] = { 0,0,255,0 };
@@ -135,7 +135,7 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_l:
-					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT);
+					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 					scene.setObj(0, object("test.obj", "test_smooth.obj", true));
 					break;
 				case SDLK_a:
@@ -176,7 +176,7 @@ int main(int argc, char* args[])
 			}
 
 			if (!hidden && !stop) {
-				//memset(pixels, -1, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
+				memset(pixels, -1, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				/*
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
@@ -198,7 +198,8 @@ int main(int argc, char* args[])
 				//angle++;
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
-				//pipe.draw(scene, pixels, SCREEN_WIDTH, SCREEN_HEIGHT);
+				pipe.draw(scene);
+				
 				
 				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
 				SDL_RenderClear(renderer);
@@ -224,6 +225,6 @@ int main(int argc, char* args[])
 	SDL_DestroyRenderer(renderer);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
-
+	
 	return 0x1a4;
 }

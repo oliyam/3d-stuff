@@ -40,8 +40,14 @@ class Scene {
 	public:
 		vector<double> triangle_vertices;
 		vector<double> triangle_vertex_normals;
-		vector<double> triangle_face_normals;
+		vector<vec3> triangle_face_normals;
 		vector<double> triangle_uvs;
+
+		int getObjectNumber() 
+		{return objects.size();}
+
+		int getFaceNumber(int obj)
+		{return objects.at(obj).faces.size();}
 
 		void rotate(int index, int axis, float angle)
 		{objects.at(index).rotateObj(axis, angle);}
@@ -84,6 +90,9 @@ class Scene {
 		vector<object> getObjects()
 		{return objects;}
 
+		object& getObject(int i)
+		{return objects.at(i);}
+
 		vector<vec3> getPositions()
 		{return positions;}
 
@@ -112,7 +121,7 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "torus";
+			string obj = "spyro";
 			string obj1 = "";
 			for (int i = 0; i < 1; i++)
 				objects.push_back(object(obj+".obj", obj+"_smooth.obj", true));
@@ -121,8 +130,9 @@ class Scene {
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("torus.obj", "torus_smooth.obj", false));
+			cameras.push_back(camera(vec3(0, 6, 0), vec3(45, 0, 180), 10));
 			for(int i=1;i<=3;i++)
-				cameras.push_back(camera(vec3(i * -5, i * -5, i * -5), vec3(30, -45, 0), 10));
+				cameras.push_back(camera(vec3(i * 10, i * 10, i * 10), vec3(30, -45, 0), 10));
 			lights.push_back(light(vec3(0,0,-10)));
 			cameras.push_back(camera(vec3(0, 0, -10), vec3(0, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 0, 10), vec3(180, 0, 180), 10));
@@ -142,9 +152,12 @@ class Scene {
 				for (vector<int> f : o.uv)
 					for (int p : f)
 					{
-						triangle_vertices.push_back(o.uv_texture_coordinates.at(p - 1).getX());
-						triangle_vertices.push_back(o.uv_texture_coordinates.at(p - 1).getY());
+						triangle_uvs.push_back(o.uv_texture_coordinates.at(p - 1).getX());
+						triangle_uvs.push_back(o.uv_texture_coordinates.at(p - 1).getY());
 					}
+				for (vec3 n : o.face_normals) {
+					triangle_face_normals.push_back(n);
+				}
 			}
 		}
 };
