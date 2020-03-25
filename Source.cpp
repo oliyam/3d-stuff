@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 6;
+double multiplikator = 4;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff

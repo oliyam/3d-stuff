@@ -121,16 +121,16 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "spyro";
+			string obj = "test";
 			string obj1 = "";
 			for (int i = 0; i < 1; i++)
-				objects.push_back(object(obj+".obj", obj+"_smooth.obj", true));
+				objects.push_back(object(obj+".obj", obj+"_smooth.obj", 1));
 			//objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", true));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("torus.obj", "torus_smooth.obj", false));
-			cameras.push_back(camera(vec3(0, 6, 0), vec3(45, 0, 180), 10));
+			cameras.push_back(camera(vec3(0, 0, -10), vec3(45, 0, 180), 10));
 			for(int i=1;i<=3;i++)
 				cameras.push_back(camera(vec3(i * 10, i * 10, i * 10), vec3(30, -45, 0), 10));
 			lights.push_back(light(vec3(0,0,-10)));
@@ -140,24 +140,6 @@ class Scene {
 			cameras.push_back(camera(vec3(-10, 0, 0), vec3(0, -90, 0), 10));
 			cameras.push_back(camera(vec3(0, -10, 0), vec3(90, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 10, 0), vec3(-90, 0, 0), 10));		
-			for (object o:objects)
-			{
-				for(vector<int> f:o.faces)
-					for (int p : f)
-					{
-						triangle_vertices.push_back(o.vertices.at(p-1).getX());
-						triangle_vertices.push_back(o.vertices.at(p-1).getY());
-						triangle_vertices.push_back(o.vertices.at(p-1).getZ());
-					}
-				for (vector<int> f : o.uv)
-					for (int p : f)
-					{
-						triangle_uvs.push_back(o.uv_texture_coordinates.at(p - 1).getX());
-						triangle_uvs.push_back(o.uv_texture_coordinates.at(p - 1).getY());
-					}
-				for (vec3 n : o.face_normals) {
-					triangle_face_normals.push_back(n);
-				}
-			}
+
 		}
 };

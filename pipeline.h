@@ -64,6 +64,40 @@ private:
 			}
 		}
 	}
+	void drawLine(bool* pixels, Uint32 color_int, double x1, double y1, double x2, double y2) {
+		int y, x;
+		float k = (y1 - y2) / (x1 - x2);
+		if (abs(x1 - x2) > abs(y1 - y2))
+		{
+			if (x1 < x2) {
+				swap(x1, x2);
+				swap(y1, y2);
+			}
+			if (x2 < 0)
+				x2 = 0;
+			for (int x = x2; x < size_x && x < x1; x++)
+			{
+				y = k * (x - x1) + y1;
+				if (y >= 0 && y < size_y)
+					pixels[y * size_x + x] = true;
+			}
+		}
+		else
+		{
+			if (y1 < y2) {
+				swap(x1, x2);
+				swap(y1, y2);
+			}
+			if (y2 < 0)
+				y2 = 0;
+			for (int y = y2; y < size_y && y < y1; y++)
+			{
+				x = (y - y1) / k + x1;
+				if (x >= 0 && x < size_x)
+					pixels[y * size_x + x] = true;
+			}
+		}
+	}
 	/*
 	draws a face ... its simple ...
 	*/
@@ -172,15 +206,15 @@ private:
 	/*
 	fills a face ... its simple ...
 	*/
-	void fillFace(Uint8* color, Uint32* pixels, int size_x, int size_y, vector<vec2> points)
+	void fillFace(Uint32 color_int, double points[])
 	{
-		Uint32 color_int = color[0] * 256 * 256 * 256 + color[1] * 256 * 256 + color[2] * 256 + color[3];
 		bool* buffer = new bool[size_x * size_y];
 		memset(buffer, 0, size_x * size_y);
-		for (int i = 0; i < points.size() - 1; i++)
-			drawLineToBoolBuffer(buffer, size_x, size_y, points.at(i), points.at(i + 1));
-		drawLineToBoolBuffer(buffer, size_x, size_y, points.at(0), points.at(points.size() - 1));
 
+		drawLine(buffer, color_int, points[0], points[1], points[3], points[4]);
+		drawLine(buffer, color_int, points[3], points[4], points[6], points[7]);
+		drawLine(buffer, color_int, points[6], points[7], points[0], points[1]);
+		
 		int first = 0, last = 0;
 		bool first_time;
 		for (int y = 0; y < size_y; y++)
@@ -530,6 +564,7 @@ public:
 			vec3 pos = cam.getPos();
 			int cam_x = size_x / cam.getViewX();
 			int cam_y = size_y / cam.getViewY();
+			double focus = cam.getFocus();
 			//draw all objects in the scene
 			//animation stuff
 
@@ -541,42 +576,39 @@ public:
 			}
 			int t = current_texture % number_of_textures;
 
-			int max = scene.getObjectNumber();
-			for (int o = 0; o < max; o++) {
-				int max = scene.getFaceNumber(o);
+				int max = scene.getFaceNumber(0);
+				object& obj = scene.getObject(0);
 				for (int f = 0; f < max; f++) {
-					object& obj = scene.getObject(o);
 			
 					vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
 					
-					if (0 < obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1)))
+					if (0 < (obj.face_normals.at(f) * (pos - point0)))
 					{
 						double points[9];
 						points[2] = point0.getZ();
 						if (points[2] < 1)
 							points[2] = 1;
-						points[0] = (point0.getX() / points[2]) * cam_x + center_x;
-						points[1] = (point0.getY() / points[2]) * cam_y + center_y;
+						points[0] = (point0.getX() * focus / points[2]) * cam_x + center_x;
+						points[1] = (point0.getY() * focus / points[2]) * cam_y + center_y;
 
 						vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
 						points[5] = point1.getZ();
 						if (points[5] < 1)
 							points[5] = 1;
-						points[3] = (point1.getX() / points[5]) * cam_x + center_x;
-						points[4] = (point1.getY() / points[5]) * cam_y + center_y;
+						points[3] = (point1.getX() * focus / points[5]) * cam_x + center_x;
+						points[4] = (point1.getY() * focus / points[5]) * cam_y + center_y;
 
 						vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
 						points[8] = point2.getZ();
 						if (points[8] < 1)
 							points[8] = 1;
-						points[6] = (point2.getX() / points[8]) * cam_x + center_x;
-						points[7] = (point2.getY() / points[8]) * cam_y + center_y;
+						points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
+						points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
 
-						drawFace(orange, points);
-
+						if(points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y)
+							drawFace(orange, points);
 					}
 				}
-			}
 		}
 	}
 };
