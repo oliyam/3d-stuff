@@ -121,7 +121,7 @@ class Scene {
 
 		Scene() 
 		{
-			string obj = "chest";
+			string obj = "spyro";
 			string obj1 = "";
 			for (int i = 0; i < 1; i++)
 				objects.push_back(object(obj+".obj", obj+"_smooth.obj", 1));
