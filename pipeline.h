@@ -160,6 +160,11 @@ private:
 			d4 = points[0] - points[6],
 			d0 = d1 * d4 + d2 * (points[1] - points[7])
 		;
+		int 
+			red_ = red / points[2],
+			green_ = green / points[5],
+			blue_ = blue / points[8]
+		;
 		if (min_x < 0)
 			min_x = 0;
 		if (min_y < 0)
@@ -180,7 +185,7 @@ private:
 					if (zBuffer[o] < w)
 					{
 						zBuffer[o] = w;
-						pixels[o] = ((int)(red * w_v0) & 0x00FF0000) | ((int)(green * w_v1) & 0x0000FF00) | ((int)(blue * w_v2) & 0x000000FF);
+						pixels[o] = (((int)(red_ * w_v0 / w) & 0x00FF0000) | ((int)(green_ * w_v1 / w) & 0x0000FF00) | ((int)(blue_ * w_v2  / w) & 0x000000FF));
 					}
 				}
 			}
