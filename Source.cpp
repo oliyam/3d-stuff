@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 7;
+double multiplikator = 6;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -57,7 +57,7 @@ int main(int argc, char* args[])
 	bool hidden = false;
 	int active_camera=0;
 	string pictures = "spyro";
-	int number = 1;
+	int number = 12;
 
 	//declare pixel array accommodating all pixels on the screen
 	Uint32* pixels = new Uint32[SCREEN_WIDTH * SCREEN_HEIGHT];

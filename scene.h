@@ -122,9 +122,11 @@ class Scene {
 		Scene() 
 		{
 			string obj = "spyro";
-			string obj1 = "";
-			for (int i = 0; i < 1; i++)
-				objects.push_back(object(obj+".obj", obj+"_smooth.obj", 1));
+			int num = 1;
+			for (int i = 0; i < num; i++) {
+				objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
+				cout << i+1 << " of " << num << " objects loaded" << endl;
+			}
 			//objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", true));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));

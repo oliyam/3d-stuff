@@ -197,7 +197,7 @@ size_y is the height of the frame (pixel array)
 	/*
 	draws a texture to a face ... its simple ...
 	*/
-	void drawTextureToFace(double points[], double uvs[])
+	void drawTextureToFace(double points[], double uvs[], int t)
 	{
 		int
 			min_x = min(min(points[0], points[3]), points[6]),
@@ -240,11 +240,11 @@ size_y is the height of the frame (pixel array)
 					if (zBuffer[o] < w)
 					{
 						int
-							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
-							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
+							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
+							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
 							;
 						zBuffer[o] = w;
-						pixels[o] = texture[0][v * size[0][0] + u];
+						pixels[o] = texture[t][v * size[t][0] + u];
 					}
 				}
 			}
@@ -281,14 +281,15 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						if(w_v0>0&&w_v1>0&&w_v2>0)
 						if (zBuffer[y * size_x + x] < w)
 						{
 							int
-								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
-								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
+								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
+								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
 								;
 							zBuffer[y * size_x + x] = w;
-							pixels[y * size_x + x] = texture[0][v * size[0][0] + u];
+							pixels[y * size_x + x] = texture[t][v * size[t][0] + u];
 						}
 					}
 				}
@@ -314,6 +315,7 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
 						if (zBuffer[y * size_x + x] < w)
 						{
 							int
@@ -455,6 +457,7 @@ public:
 			size[i][1] = (unsigned)((Uint8)texture_file[22] * pow(0x100, 0) + (Uint8)texture_file[23] * pow(0x100, 1) + (Uint8)texture_file[24] * pow(0x100, 2) + (Uint8)texture_file[25] * pow(0x100, 3));
 			size[i][1] = abs(size[i][1]);
 			texture[i] = bitmapToTexture(texture_file, size[i][0], size[i][1]);
+			cout << i + 1 << " of " << number_of_textures << " textures loaded" << endl;
 		}
 	}
 	void draw(Scene& scene)
@@ -482,53 +485,55 @@ public:
 				current_texture++;
 			}
 			int t = current_texture % number_of_textures;
-
-				int max = scene.getFaceNumber(0);
-				object& obj = scene.getObject(0);
+			int max = scene.getObjectNumber();
+			for (int i = 0; i < max; i++) {
+				int max = scene.getFaceNumber(i);
+				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
-					if((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
-					if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
-					{
-						double points[9];
-						double uvs[6];
-
-						vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
-						points[2] = point0.getZ();
-						if (points[2] < 1)
-							points[2] = 1;
-						points[0] = (point0.getX() * focus / points[2]) * cam_x + center_x;
-						points[1] = (point0.getY() * focus / points[2]) * cam_y + center_y;
-						vec2 uv0 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(0) - 1);
-						uvs[0] = uv0.getX();
-						uvs[1] = uv0.getY();
-
-						vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
-						points[5] = point1.getZ();
-						if (points[5] < 1)
-							points[5] = 1;
-						points[3] = (point1.getX() * focus / points[5]) * cam_x + center_x;
-						points[4] = (point1.getY() * focus / points[5]) * cam_y + center_y;
-						vec2 uv1 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(1) - 1);
-						uvs[2] = uv1.getX();
-						uvs[3] = uv1.getY();
-
-						vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
-						points[8] = point2.getZ();
-						if (points[8] < 1)
-							points[8] = 1;
-						points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
-						points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
-						vec2 uv2 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(2) - 1);
-						uvs[4] = uv2.getX();
-						uvs[5] = uv2.getY();
-
-						if ((points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y) || (points[3] > 0 && points[3] < size_x && points[4] > 0 && points[4] < size_y) || (points[6] > 0 && points[6] < size_x && points[7] > 0 && points[7] < size_y))
+					if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
+						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 						{
-							drawTextureToFace(points, uvs);
-							//drawFace(outline, points);
+							double points[9];
+							double uvs[6];
+
+							vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
+							points[2] = point0.getZ();
+							if (points[2] < 1)
+								points[2] = 1;
+							points[0] = (point0.getX() * focus / points[2]) * cam_x + center_x;
+							points[1] = (point0.getY() * focus / points[2]) * cam_y + center_y;
+							vec2 uv0 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(0) - 1);
+							uvs[0] = uv0.getX();
+							uvs[1] = uv0.getY();
+
+							vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
+							points[5] = point1.getZ();
+							if (points[5] < 1)
+								points[5] = 1;
+							points[3] = (point1.getX() * focus / points[5]) * cam_x + center_x;
+							points[4] = (point1.getY() * focus / points[5]) * cam_y + center_y;
+							vec2 uv1 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(1) - 1);
+							uvs[2] = uv1.getX();
+							uvs[3] = uv1.getY();
+
+							vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
+							points[8] = point2.getZ();
+							if (points[8] < 1)
+								points[8] = 1;
+							points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
+							points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
+							vec2 uv2 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(2) - 1);
+							uvs[4] = uv2.getX();
+							uvs[5] = uv2.getY();
+
+							if ((points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y) || (points[3] > 0 && points[3] < size_x && points[4] > 0 && points[4] < size_y) || (points[6] > 0 && points[6] < size_x && points[7] > 0 && points[7] < size_y))
+							{
+								drawTextureToFace(points, uvs, t);
+								//drawFace(outline, points);
+							}
 						}
-					}
 				}
+			}
 		}
 	}
 };
