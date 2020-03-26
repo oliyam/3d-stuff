@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 4;
+double multiplikator = 2;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -176,7 +176,7 @@ int main(int argc, char* args[])
 			}
 
 			if (!hidden && !stop) {
-				memset(pixels, -1, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
+				memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				/*
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)

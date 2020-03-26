@@ -108,6 +108,85 @@ private:
 		drawLine(color, points[6], points[7], points[0], points[1]);
 	}
 	/*
+	fills a face ... its simple ...
+	*/
+	void fillFace(Uint32 color, double points[], int l)
+	{
+		int
+		min_x = min(min(points[0], points[3]), points[6]),
+		max_x = max(max(points[0], points[3]), points[6]),
+		min_y = min(min(points[1], points[4]), points[7]),
+		max_y = max(max(points[1], points[4]), points[7])
+		;
+		double
+			d0 = (points[4] - points[1]),
+			d1 = (points[7] - points[4]),
+			d2 = (points[1] - points[7]),
+			d3 = (points[3] - points[0]),
+			d4 = (points[6] - points[3]),
+			d5 = (points[0] - points[6])
+		;
+		if (min_x < 0)
+			min_x = 0;
+		if (min_y < 0)
+			min_y = 0;
+		for (int y = min_y; y < max_y && y < size_y; y++) {
+			for (int x = min_x; x < max_x && x < size_x; x++) {
+				double
+					e1 = (x - points[0]) * d0 - (y - points[1]) * d3,
+					e2 = (x - points[3]) * d1 - (y - points[4]) * d4,
+					e3 = (x - points[6]) * d2 - (y - points[7]) * d5
+				;
+				if(e1 > 0 && e2 > 0 && e3 > 0) 
+					pixels[y * size_x + x] = color;
+			}
+		}
+	}
+	/*
+	fills a face ... its simple ...
+	*/
+	void fillFace(Uint32 color, double points[])
+	{
+		int
+			min_x = min(min(points[0], points[3]), points[6]),
+			max_x = max(max(points[0], points[3]), points[6]),
+			min_y = min(min(points[1], points[4]), points[7]),
+			max_y = max(max(points[1], points[4]), points[7])
+		;
+		double
+			d1 = points[4] - points[7],
+			d2 = points[6] - points[3],
+			d3 = points[7] - points[1],
+			d4 = points[0] - points[6],
+			d0 = d1 * d4 + d2 * (points[1] - points[7])
+		;
+		if (min_x < 0)
+			min_x = 0;
+		if (min_y < 0)
+			min_y = 0;
+		for (int y = min_y; y < max_y && y < size_y; y++) {
+			double y1 = y - points[7];
+			int i = y * size_x;
+			for (int x = min_x; x < max_x && x < size_x; x++) {
+				double
+					x1 = x - points[6],
+					w_v0 = (d1 * x1 + d2 * y1) / d0,
+					w_v1 = (d3 * x1 + d4 * y1) / d0,
+					w_v2 = 1 - w_v0 - w_v1
+				;
+				if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+					int o = i + x;
+					double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+					if (zBuffer[o] < w)
+					{
+						zBuffer[o] = w;
+						pixels[o] = ((int)(red * w_v0) & 0x00FF0000) | ((int)(green * w_v1) & 0x0000FF00) | ((int)(blue * w_v2) & 0x000000FF);
+					}
+				}
+			}
+		}
+	}
+	/*
 	draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
 	size_x is the width of the frame (pixel array)
 	size_y is the height of the frame (pixel array)
@@ -206,7 +285,7 @@ private:
 	/*
 	fills a face ... its simple ...
 	*/
-	void fillFace(Uint32 color_int, double points[])
+	void fillFace(Uint32 color_int, double points[], bool l)
 	{
 		bool* buffer = new bool[size_x * size_y];
 		memset(buffer, 0, size_x * size_y);
@@ -471,14 +550,20 @@ private:
 	Uint32** texture;
 	Uint32* pixels;
 	Uint8 FACES[4] = { 0,255,255,255 }, NORMALS[4] = { 0,255,0,255 }, RGB_COLORS[3][4] = { { 0,255,0,0 }, { 0,0,255,0 }, { 0,0,0,255 } }, CMY_COLORS[3][4] = { { 0,0,255,255 }, { 0,255,0,255 }, { 0,255,255,0 } }, CAMERA[4] = { 0,0,0,0 }, OUTLINE[4] = { 0,255,165,0 };
-	Uint32 orange = OUTLINE[0] * 256 * 256 * 256 + OUTLINE[1] * 256 * 256 + OUTLINE[2] * 256 + OUTLINE[3];
+	Uint32
+		outline = OUTLINE[0] * 256 * 256 * 256 + OUTLINE[1] * 256 * 256 + OUTLINE[2] * 256 + OUTLINE[3],
+		face = FACES[0] * 256 * 256 * 256 + FACES[1] * 256 * 256 + FACES[2] * 256 + FACES[3],
+		red = 256 * 256 * 255,
+		green = 256 * 255,
+		blue = 255
+	;
 	Uint8 colors[3][4] = {
 					{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
 					{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
 					{ CMY_COLORS[0][0], CMY_COLORS[0][1], CMY_COLORS[0][2], CMY_COLORS[0][3] }
 	};
 	Uint8* color = NORMALS;
-	int size_x, size_y;
+	int size_x, size_y, length;
 	double* zBuffer;
 
 	//opencl attributes
@@ -496,6 +581,7 @@ public:
 		pixels = lel;
 		size_x = x;
 		size_y = y;
+		length = x * y;
 		zBuffer = new double[x * y];
 		memset(zBuffer, 0, x * y * sizeof(double));
 		/*
@@ -579,12 +665,11 @@ public:
 				int max = scene.getFaceNumber(0);
 				object& obj = scene.getObject(0);
 				for (int f = 0; f < max; f++) {
-			
-					vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
-					
-					if (0 < (obj.face_normals.at(f) * (pos - point0)))
+							
+					if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 					{
 						double points[9];
+						vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
 						points[2] = point0.getZ();
 						if (points[2] < 1)
 							points[2] = 1;
@@ -605,8 +690,11 @@ public:
 						points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
 						points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
 
-						if(points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y)
-							drawFace(orange, points);
+						if (points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y)
+						{
+							fillFace(face, points);
+							drawFace(outline, points);
+						}
 					}
 				}
 		}
