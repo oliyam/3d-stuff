@@ -26,10 +26,10 @@ class Pipeline {
 
 private:
 	/*
-	draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
-	size_x is the width of the frame (pixel array)
-	size_y is the height of the frame (pixel array)
-	*/
+draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
+size_x is the width of the frame (pixel array)
+size_y is the height of the frame (pixel array)
+*/
 	void drawLine(Uint32 color_int, double x1, double y1, double x2, double y2) {
 		int y, x;
 		float k = (y1 - y2) / (x1 - x2);
@@ -64,7 +64,6 @@ private:
 			}
 		}
 	}
-
 	/*
 	whatever ...
 	*/
@@ -240,13 +239,90 @@ private:
 					double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
 					if (zBuffer[o] < w)
 					{
-
 						int
 							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
 							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
 							;
 						zBuffer[o] = w;
 						pixels[o] = texture[0][v * size[0][0] + u];
+					}
+				}
+			}
+		}
+		//draw edges
+		for (int i = 0; i < 3; i++) {
+			int y, x;
+			double x1, y1, x2, y2;
+			if(i==0)
+				x1 = points[0], y1 = points[1], x2 = points[3], y2 = points[4];
+			else if(i==1)
+				x1 = points[3], y1 = points[4], x2 = points[6], y2 = points[7];
+			else
+				x1 = points[6], y1 = points[7], x2 = points[0], y2 = points[1];
+			float k = (y1 - y2) / (x1 - x2);
+			if (abs(x1 - x2) > abs(y1 - y2))
+			{
+				if (x1 < x2) {
+					swap(x1, x2);
+					swap(y1, y2);
+				}
+				if (x2 < 0)
+					x2 = 0;
+				for (int x = x2; x < size_x && x < x1; x++)
+				{
+					y = k * (x - x1) + y1;
+					if (y >= 0 && y < size_y)
+					{
+						double y0 = y - points[7];
+						double
+							x1 = x - points[6],
+							w_v0 = (d1 * x1 + d2 * y0) / d0,
+							w_v1 = (d3 * x1 + d4 * y0) / d0,
+							w_v2 = 1 - w_v0 - w_v1
+							;
+						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						if (zBuffer[y * size_x + x] < w)
+						{
+							int
+								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
+								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
+								;
+							zBuffer[y * size_x + x] = w;
+							pixels[y * size_x + x] = texture[0][v * size[0][0] + u];
+						}
+					}
+				}
+			}
+			else
+			{
+				if (y1 < y2) {
+					swap(x1, x2);
+					swap(y1, y2);
+				}
+				if (y2 < 0)
+					y2 = 0;
+				for (int y = y2; y < size_y && y < y1; y++)
+				{
+					x = (y - y1) / k + x1;
+					if (x >= 0 && x < size_x)
+					{
+						double y0 = y - points[7];
+						double
+							x1 = x - points[6],
+							w_v0 = (d1 * x1 + d2 * y0) / d0,
+							w_v1 = (d3 * x1 + d4 * y0) / d0,
+							w_v2 = 1 - w_v0 - w_v1
+							;
+						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						if (zBuffer[y * size_x + x] < w)
+						{
+							int
+								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
+								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
+								;
+							zBuffer[y * size_x + x] = w;
+							pixels[y * size_x + x] = texture[0][v * size[0][0] + u];
+						}
 					}
 				}
 			}
@@ -265,7 +341,6 @@ private:
 		file.close();
 		return ret;
 	}
-
 	/*
 	converts a bitmap file (in  form of a char buffer)
 	into a texture buffer of unsigned 32bit integers
@@ -400,7 +475,6 @@ public:
 			double focus = cam.getFocus();
 			//draw all objects in the scene
 			//animation stuff
-
 			currentTime = Clock::now();
 			chrono::duration<double> time_span = currentTime - lastTime;
 			if (time_span.count() >= interval) {
@@ -412,7 +486,7 @@ public:
 				int max = scene.getFaceNumber(0);
 				object& obj = scene.getObject(0);
 				for (int f = 0; f < max; f++) {
-							
+					if((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
 					if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 					{
 						double points[9];
@@ -448,7 +522,7 @@ public:
 						uvs[4] = uv2.getX();
 						uvs[5] = uv2.getY();
 
-						if (points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y)
+						if ((points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y) || (points[3] > 0 && points[3] < size_x && points[4] > 0 && points[4] < size_y) || (points[6] > 0 && points[6] < size_x && points[7] > 0 && points[7] < size_y))
 						{
 							drawTextureToFace(points, uvs);
 							//drawFace(outline, points);

@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 5;
+double multiplikator = 7;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -91,9 +91,10 @@ int main(int argc, char* args[])
 
 	while (!quit)
 	{
+		
 		//measure start time
 		auto startTime = Clock::now();
-
+		
 			//event handling
 			SDL_PollEvent(&event);
 			switch (event.type)
@@ -136,7 +137,25 @@ int main(int argc, char* args[])
 				{
 				case SDLK_l:
 					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
-					scene.setObj(0, object("test.obj", "test_smooth.obj", true));
+					scene.setObj(0, object("chest.obj", "chest.obj", true));
+					break;
+				case SDLK_LEFT:
+					scene.moveActiveCam(vec3(-0.1, 0, 0));
+					break;
+				case SDLK_DOWN:
+					scene.moveActiveCam(vec3(0, -0.1, 0));
+					break;
+				case SDLK_KP_MINUS:
+					scene.moveActiveCam(vec3(0, 0, -1));
+					break;
+				case SDLK_RIGHT:
+					scene.moveActiveCam(vec3(0.1, 0, 0));
+					break;
+				case SDLK_UP:
+					scene.moveActiveCam(vec3(0, 0.1, 0));
+					break;
+				case SDLK_KP_PLUS:
+					scene.moveActiveCam(vec3(0, 0, 1));
 					break;
 				case SDLK_a:
 					scene.rotate(0, 0, 10);
@@ -162,27 +181,29 @@ int main(int argc, char* args[])
 				case SDLK_LCTRL:
 					HideConsole();
 					break;
+				/*
 				case SDLK_KP_PLUS:
 					shift++;
 					break;
 				case SDLK_KP_MINUS:
 					shift--;
 					break;
+					*/
 				case SDLK_SPACE:
 					stop = !stop;
 					break;
 				}
 				break;
 			}
-
+			
 			if (!hidden && !stop) {
-				memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
+				//memset(pixels, -1, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				/*
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 						pixels[y * SCREEN_WIDTH + x] = 0 * 256 * 256 * 256 + 70 * 256 * 256 + 70 * 256 + 70;
 				*/
-				/*
+				
 				//cool gradient
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
@@ -191,7 +212,7 @@ int main(int argc, char* args[])
 						//Uint8 a = 0, r =255, g = 255, b = 255;
 						pixels[y * SCREEN_WIDTH + x] = a * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b;
 					}
-				*/
+				
 				//draw the spinning line thingy
 				//memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 				//pixels = drawLine(GREEN, pixels, SCREEN_WIDTH, vec2(SCREEN_WIDTH / 2 + cos(angle * 3.14 / 180)*10, SCREEN_HEIGHT / 2 + sin(angle * 3.14 / 180) * 10), vec2(SCREEN_WIDTH/2+cos(angle * 3.14 / 180)* SCREEN_HEIGHT / 2, SCREEN_HEIGHT/2+sin(angle * 3.14 / 180)* SCREEN_HEIGHT / 2));
@@ -199,7 +220,6 @@ int main(int argc, char* args[])
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
 				pipe.draw(scene);
-				
 				
 				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
 				SDL_RenderClear(renderer);
