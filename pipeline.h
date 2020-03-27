@@ -268,7 +268,7 @@ size_y is the height of the frame (pixel array)
 				}
 				if (x2 < 0)
 					x2 = 0;
-				for (int x = x2; x < size_x && x < x1; x++)
+				for (int x = x2; x < size_x && x <= x1; x++)
 				{
 					y = k * (x - x1) + y1;
 					if (y >= 0 && y < size_y)
@@ -302,7 +302,7 @@ size_y is the height of the frame (pixel array)
 				}
 				if (y2 < 0)
 					y2 = 0;
-				for (int y = y2; y < size_y && y < y1; y++)
+				for (int y = y2; y < size_y && y <= y1; y++)
 				{
 					x = (y - y1) / k + x1;
 					if (x >= 0 && x < size_x)
@@ -451,6 +451,7 @@ public:
 		texture = new Uint32 * [number_of_textures];
 		string extension = ".bmp";
 		string file_name = "assets/bitmaps/" + path;
+		cout << "Loading textures ..." << endl;
 		for (int i = 0; i < number_of_textures; i++) {
 			char* texture_file = readFileBytes(file_name + to_string(i + 1) + extension);
 			size[i][0] = (Uint8)texture_file[18] * pow(0x100, 0) + (Uint8)texture_file[19] * pow(0x100, 1) + (Uint8)texture_file[20] * pow(0x100, 2) + (Uint8)texture_file[21] * pow(0x100, 3);

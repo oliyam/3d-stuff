@@ -121,6 +121,7 @@ class Scene {
 
 		Scene() 
 		{
+			cout << "Loading objects ..." << endl;
 			string obj = "spyro";
 			int num = 1;
 			for (int i = 0; i < num; i++) {

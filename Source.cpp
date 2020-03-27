@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string>
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include <thread>
 
@@ -23,7 +24,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 6;
+double multiplikator = 5;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -49,7 +50,7 @@ int main(int argc, char* args[])
 	SDL_Init(SDL_INIT_VIDEO);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, 0);
 
-	SDL_Window* window = SDL_CreateWindow("3D Stuff yo", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
+	SDL_Window* window = SDL_CreateWindow("Loading ...", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_RESIZABLE);
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);// SDL_RENDERER_ACCELERATED);
 	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -66,6 +67,12 @@ int main(int argc, char* args[])
 	//memset(pixels, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 	//memset(pixels_background, 0, SCREEN_WIDTH * SCREEN_HEIGHT * sizeof(Uint32));
 
+	cout << "========================================================" << endl;
+	cout << "=----------------------3D ENGINE-----------------------=" << endl;
+	cout << "========================================================" << endl;
+	cout << "=------------------Jan Oliver Yameogo------------------=" << endl;
+	cout << "========================================================" << endl;
+	cout << "Loading scene ..." << endl;
 	Scene scene = Scene();
 	Pipeline pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 
@@ -235,7 +242,7 @@ int main(int argc, char* args[])
 		chrono::duration<double> time_span = currentTime - startTime;
 		chrono::duration<double> time_span_fps_print = currentTime - lastTime;
 		if (time_span_fps_print.count() >= 1){
-			cout << "FPS: " << 1 / time_span.count() << "; render stop: " << stop << endl;
+			SDL_SetWindowTitle(window, ("FPS: " + to_string(1 / time_span.count())).c_str());
 			lastTime = Clock::now();
 		}
 	}
