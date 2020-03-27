@@ -224,6 +224,7 @@ size_y is the height of the frame (pixel array)
 			min_x = 0;
 		if (min_y < 0)
 			min_y = 0;
+		//draw face
 		for (int y = min_y; y < max_y && y < size_y; y++) {
 			double y1 = y - points[7];
 			int i = y * size_x;
@@ -281,15 +282,17 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
-						if(w_v0>0&&w_v1>0&&w_v2>0)
-						if (zBuffer[y * size_x + x] < w)
-						{
-							int
-								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
-								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
-								;
-							zBuffer[y * size_x + x] = w;
-							pixels[y * size_x + x] = texture[t][v * size[t][0] + u];
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+							int o = y * size_x + x;
+							if (zBuffer[o] < w)
+							{
+								int
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
+									;
+								zBuffer[o] = w;
+								pixels[o] = texture[t][v * size[t][0] + u];
+							}
 						}
 					}
 				}
@@ -315,15 +318,17 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
-						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
-						if (zBuffer[y * size_x + x] < w)
-						{
-							int
-								u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[0][0]) * 1) % size[0][0]),
-								v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[0][1]) * 1) % size[0][1])
-								;
-							zBuffer[y * size_x + x] = w;
-							pixels[y * size_x + x] = texture[0][v * size[0][0] + u];
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+							int o = y * size_x + x;
+							if (zBuffer[o] < w)
+							{
+								int
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
+									;
+								zBuffer[o] = w;
+								pixels[o] = texture[t][v * size[t][0] + u];
+							}
 						}
 					}
 				}
@@ -458,8 +463,9 @@ public:
 			size[i][1] = (unsigned)((Uint8)texture_file[22] * pow(0x100, 0) + (Uint8)texture_file[23] * pow(0x100, 1) + (Uint8)texture_file[24] * pow(0x100, 2) + (Uint8)texture_file[25] * pow(0x100, 3));
 			size[i][1] = abs(size[i][1]);
 			texture[i] = bitmapToTexture(texture_file, size[i][0], size[i][1]);
-			cout << i + 1 << " of " << number_of_textures << " textures loaded" << endl;
+			cout << i + 1 << " of " << number_of_textures << " textures loaded: [" << path << i+1 << ".bmp]" << endl;
 		}
+		cout << "Loading finished!" << endl;
 	}
 	void draw(Scene& scene)
 	{
@@ -491,7 +497,7 @@ public:
 				int max = scene.getFaceNumber(i);
 				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
-					if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
+					//if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
 						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 						{
 							double points[9];

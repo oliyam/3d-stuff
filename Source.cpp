@@ -96,12 +96,14 @@ int main(int argc, char* args[])
 
 	SDL_UpdateTexture(texture, NULL, pixels_background, SCREEN_WIDTH * sizeof(Uint32));
 
+	int last = 0;
+
 	while (!quit)
 	{
 		
 		//measure start time
 		auto startTime = Clock::now();
-		
+
 			//event handling
 			SDL_PollEvent(&event);
 			switch (event.type)
@@ -129,15 +131,16 @@ int main(int argc, char* args[])
 					leftMouseButtonDown = true;
 				break;
 			case SDL_MOUSEMOTION:
-				/*
 				if (leftMouseButtonDown)
 				{
-					mouseX = event.motion.x;
-					mouseY = event.motion.y;
-					Uint8 a = 0, r = 255, g = 165, b = 0;
-					pixels[mouseY * SCREEN_WIDTH + mouseX] = a * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b;
+					scene.rotate(0, 1, event.motion.xrel);
+					scene.rotate(0, vec3(1, 0, 0), event.motion.yrel);
+					event.type = NULL;
 				}
-				*/
+				break;
+			case SDL_MOUSEWHEEL:
+				scene.moveActiveCam(vec3(0, 0, event.wheel.y));
+				event.type = NULL;
 				break;
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym)
@@ -147,19 +150,19 @@ int main(int argc, char* args[])
 					scene.setObj(0, object("chest.obj", "chest.obj", true));
 					break;
 				case SDLK_LEFT:
-					scene.moveActiveCam(vec3(-0.1, 0, 0));
+					scene.moveActiveCam(vec3(-0.3, 0, 0));
 					break;
 				case SDLK_DOWN:
-					scene.moveActiveCam(vec3(0, -0.1, 0));
+					scene.moveActiveCam(vec3(0, -0.3, 0));
 					break;
 				case SDLK_KP_MINUS:
 					scene.moveActiveCam(vec3(0, 0, -1));
 					break;
 				case SDLK_RIGHT:
-					scene.moveActiveCam(vec3(0.1, 0, 0));
+					scene.moveActiveCam(vec3(0.3, 0, 0));
 					break;
 				case SDLK_UP:
-					scene.moveActiveCam(vec3(0, 0.1, 0));
+					scene.moveActiveCam(vec3(0, 0.3, 0));
 					break;
 				case SDLK_KP_PLUS:
 					scene.moveActiveCam(vec3(0, 0, 1));

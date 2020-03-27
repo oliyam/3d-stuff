@@ -78,7 +78,18 @@ public:
 		for (int i = 0; i < 3; i++)
 			axes[i] = axes[i].rotate(axes[axis], angle);
 	}
-
+	
+	void rotateObj(vec3 axis, float angle) {
+		for (int i = 0; i < vertices.size(); i++)
+			vertices.at(i) = vertices.at(i).rotate(axis, angle);
+		for (int i = 0; i < face_normals.size(); i++)
+			face_normals.at(i) = face_normals.at(i).rotate(axis, angle);
+		for (int i = 0; i < normals.size(); i++)
+			normals.at(i) = normals.at(i).rotate(axis, angle);
+		for (int i = 0; i < 3; i++)
+			axes[i] = axes[i].rotate(axis, angle);
+	}
+	
 	/*
 	reads an .obj file from the path path and a smooth object
 	*/

@@ -52,6 +52,9 @@ class Scene {
 		void rotate(int index, int axis, float angle)
 		{objects.at(index).rotateObj(axis, angle);}
 
+		void rotate(int index, vec3 axis, float angle)
+		{objects.at(index).rotateObj(axis, angle);}
+
 		void rotateCamX(int index) 
 		{cameras.at(index).setPos(vec3(cameras.at(index).getPos())+vec3(0,0,-60)); }
 		void rotateCamY(int index)
@@ -115,7 +118,7 @@ class Scene {
 		//add camera 
 		void addCamera(camera cam)
 		{cameras.push_back(cam);}
-		//add light
+		//add lighte
 		void addLight(light light)
 		{lights.push_back(light);}
 
@@ -126,7 +129,7 @@ class Scene {
 			int num = 1;
 			for (int i = 0; i < num; i++) {
 				objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
-				cout << i+1 << " of " << num << " objects loaded" << endl;
+				cout << i+1 << " of " << num << " objects loaded: [" << obj << ".obj; " << obj << "_smooth.obj]" << endl;
 			}
 			//objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", true));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));

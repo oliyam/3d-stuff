@@ -1,4 +1,4 @@
-# Blender MTL File: 'None'
+# Blender MTL File: 'untitled.blend'
 # Material Count: 2
 
 newmtl handgun
@@ -11,8 +11,8 @@ Ni 1.000000
 d 1.000000
 illum 2
 map_Kd D:\c++\game\assets\bitmaps\gun1.bmp
-map_Bump textures\\handgun_N.jpg
-map_Ks textures\\handgun_S.jpg
+map_Bump D:\\textures\\handgun_N.jpg
+map_Ks D:\\textures\\handgun_S.jpg
 
 newmtl handgun_handgun_C.jpg
 Ns 94.117647
@@ -24,5 +24,5 @@ Ni 1.000000
 d 1.000000
 illum 2
 map_Kd D:\c++\game\assets\bitmaps\gun1.bmp
-map_Bump textures\\handgun_N.jpg
-map_Ks textures\\handgun_S.jpg
+map_Bump D:\\textures\\handgun_N.jpg
+map_Ks D:\\textures\\handgun_S.jpg
