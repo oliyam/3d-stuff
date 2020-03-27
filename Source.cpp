@@ -54,7 +54,11 @@ int main(int argc, char* args[])
 	SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);// SDL_RENDERER_ACCELERATED);
 	SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	bool leftMouseButtonDown = false;
+	bool
+		leftMouseButtonDown = false,
+		rightMouseButtonDown = false,
+		middleMouseButtonDown = false
+	;
 	bool hidden = false;
 	int active_camera=0;
 	string pictures = "spyro";
@@ -125,13 +129,21 @@ int main(int argc, char* args[])
 			case SDL_MOUSEBUTTONUP:
 				if (event.button.button == SDL_BUTTON_LEFT)
 					leftMouseButtonDown = false;
+				if (event.button.button == SDL_BUTTON_RIGHT)
+					rightMouseButtonDown = false;
+				if (event.button.button == SDL_BUTTON_MIDDLE)
+					middleMouseButtonDown = false;
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				if (event.button.button == SDL_BUTTON_LEFT)
 					leftMouseButtonDown = true;
+				if (event.button.button == SDL_BUTTON_RIGHT)
+					rightMouseButtonDown = true;
+				if (event.button.button == SDL_BUTTON_MIDDLE)
+					middleMouseButtonDown = true;
 				break;
 			case SDL_MOUSEMOTION:
-				if (leftMouseButtonDown)
+				if (middleMouseButtonDown)
 				{
 					scene.rotate(0, 1, event.motion.xrel);
 					scene.rotate(0, vec3(1, 0, 0), event.motion.yrel);
