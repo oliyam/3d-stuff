@@ -11,7 +11,7 @@
 #include <ctime>
 #include <chrono>
 
-#include "CLSetup.h"
+//#include "CLSetup.h"
 #include "vectors.h"
 #include "object.h"
 #include "scene.h"
@@ -282,7 +282,8 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
-						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
+						{
 							int o = y * size_x + x;
 							if (zBuffer[o] < w)
 							{
@@ -318,7 +319,8 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
-						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
+						{
 							int o = y * size_x + x;
 							if (zBuffer[o] < w)
 							{
@@ -394,7 +396,7 @@ size_y is the height of the frame (pixel array)
 	Uint8* color = NORMALS;
 	int size_x, size_y, length;
 	double* zBuffer;
-
+	/*
 	//opencl attributes
 	Program halloWelt;
 	Context context;
@@ -403,7 +405,7 @@ size_y is the height of the frame (pixel array)
 	vector<int> vec;
 	CommandQueue queue;
 	Kernel kernel;
-
+	*/
 public:
 	//constructor
 	Pipeline(string path, int number, int x, int y, Uint32* lel) {
@@ -497,7 +499,7 @@ public:
 				int max = scene.getFaceNumber(i);
 				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
-					//if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
+					if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
 						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 						{
 							double points[9];

@@ -1,6 +1,6 @@
 #pragma once
-
-#include <CL/cl.hpp>
+/*
+//#include <CL/cl.hpp>
 #include <iostream>
 //#include <vector>
 
@@ -52,3 +52,4 @@ Program getProgram(string path)
 
 	return program;
 }
+*/

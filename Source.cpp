@@ -1,7 +1,7 @@
-#pragma once
+﻿#pragma once
 
 #include <SDL.h>
-#include <CL/cl.hpp>
+//#include <CL/cl.hpp>
 #include <Windows.h>
 #include <stdio.h>
 #include <string>
@@ -19,12 +19,12 @@
 #include "object.h"
 
 using std::string;
-using namespace cl;
+//using namespace cl;
 using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 6;
+double multiplikator = 5;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -210,7 +210,7 @@ int main(int argc, char* args[])
 				case SDLK_KP_MINUS:
 					shift--;
 					break;
-					*/
+				*/
 				case SDLK_SPACE:
 					stop = !stop;
 					break;
@@ -230,9 +230,7 @@ int main(int argc, char* args[])
 				for (int x = 0; x < SCREEN_WIDTH; x++)
 					for (int y = 0; y < SCREEN_HEIGHT; y++)
 					{
-						Uint8 a = 0, r = y * 256 / SCREEN_HEIGHT, g = 255, b = 255;
-						//Uint8 a = 0, r =255, g = 255, b = 255;
-						pixels[y * SCREEN_WIDTH + x] = a * 256 * 256 * 256 + r * 256 * 256 + g * 256 + b;
+						pixels[y * SCREEN_WIDTH + x] = 255*256*256*256+256*256* (y * 256 / SCREEN_HEIGHT)+255*256+255;
 					}
 				
 				//draw the spinning line thingy
@@ -242,12 +240,13 @@ int main(int argc, char* args[])
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
 				pipe.draw(scene);
-				
-				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
-				SDL_RenderClear(renderer);
-				SDL_RenderCopy(renderer, texture, NULL, NULL);
-				SDL_RenderPresent(renderer);
-				
+				if(1)
+				{
+					SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
+					SDL_RenderClear(renderer);
+					SDL_RenderCopy(renderer, texture, NULL, NULL);
+					SDL_RenderPresent(renderer);
+				}
 			}
 			
 
