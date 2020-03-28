@@ -44,6 +44,7 @@ int main(int argc, char* args[])
 	int frame = 0;
 	double angle = 0;
 	int shift = 0;
+	int flat = 0;
 	bool quit = false;
 	SDL_Event event;
 
@@ -145,7 +146,7 @@ int main(int argc, char* args[])
 			case SDL_MOUSEMOTION:
 				if (middleMouseButtonDown)
 				{
-					scene.rotate(0, 1, event.motion.xrel);
+					scene.rotate(0, 1, -event.motion.xrel);
 					scene.rotate(0, vec3(1, 0, 0), event.motion.yrel);
 					event.type = NULL;
 				}
@@ -197,6 +198,9 @@ int main(int argc, char* args[])
 				case SDLK_e:
 					scene.rotate(0, 2, -10);
 					break;
+				case SDLK_f:
+					flat++;
+					break;
 				case SDLK_LSHIFT:
 					ShowConsole();
 					break;
@@ -239,7 +243,7 @@ int main(int argc, char* args[])
 				//angle++;
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
-				pipe.draw(scene);
+				pipe.draw(scene, flat%2);
 				if(1)
 				{
 					SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));

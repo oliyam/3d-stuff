@@ -26,10 +26,10 @@ class Pipeline {
 
 private:
 	/*
-draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
-size_x is the width of the frame (pixel array)
-size_y is the height of the frame (pixel array)
-*/
+	draws a line between two vec2 objects p1 and p2 onto a given pixel array pixels and returs a pointer to that very array
+	size_x is the width of the frame (pixel array)
+	size_y is the height of the frame (pixel array)
+	*/
 	void drawLine(Uint32 color_int, double x1, double y1, double x2, double y2) {
 		int y, x;
 		float k = (y1 - y2) / (x1 - x2);
@@ -197,8 +197,9 @@ size_y is the height of the frame (pixel array)
 	/*
 	draws a texture to a face ... its simple ...
 	*/
-	void drawTextureToFace(double points[], double uvs[], int t)
+	void drawTextureToFaceFlat(double points[], double uvs[], double angle, int t)
 	{
+		double m = 1;
 		int
 			min_x = min(min(points[0], points[3]), points[6]),
 			max_x = max(max(points[0], points[3]), points[6]),
@@ -235,17 +236,24 @@ size_y is the height of the frame (pixel array)
 					w_v1 = (d3 * x1 + d4 * y1) / d0,
 					w_v2 = 1 - w_v0 - w_v1
 					;
-				if (w_v0 >= 0 && w_v1 >= 0 && w_v2 >= 0) {
+				if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
 					int o = i + x;
 					double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
 					if (zBuffer[o] < w)
 					{
 						int
-							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
-							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
+							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
 							;
 						zBuffer[o] = w;
-						pixels[o] = texture[t][v * size[t][0] + u];
+						Uint32 color = texture[t][v * size[t][0] + u];
+						Uint32
+							a = (color & 0xFF000000) * angle,
+							r = (color & 0x00FF0000) * angle,
+							g = (color & 0x0000FF00) * angle,
+							b = (color & 0x000000FF) * angle
+							;
+						pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
 					}
 				}
 			}
@@ -269,7 +277,7 @@ size_y is the height of the frame (pixel array)
 				}
 				if (x2 < 0)
 					x2 = 0;
-				for (int x = x2; x < size_x && x <= x1; x++)
+				for (int x = x2; x < size_x && x <= x1+1; x++)
 				{
 					y = k * (x - x1) + y1;
 					if (y >= 0 && y < size_y)
@@ -282,18 +290,32 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						int o = y * size_x + x;
 						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
 						{
-							int o = y * size_x + x;
 							if (zBuffer[o] < w)
 							{
 								int
-									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
-									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
 									;
 								zBuffer[o] = w;
-								pixels[o] = texture[t][v * size[t][0] + u];
+								Uint32 color = texture[t][v * size[t][0] + u];
+								Uint32
+									a = (color & 0xFF000000) * angle,
+									r = (color & 0x00FF0000) * angle,
+									g = (color & 0x0000FF00) * angle,
+									b = (color & 0x000000FF) * angle
+									;
+								pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
 							}
+						}
+						else if (zBuffer[o] == 0)
+						{
+							if (o == length)
+								pixels[o] = pixels[o - 1];
+							else
+								pixels[o] = pixels[o + 1];
 						}
 					}
 				}
@@ -306,7 +328,7 @@ size_y is the height of the frame (pixel array)
 				}
 				if (y2 < 0)
 					y2 = 0;
-				for (int y = y2; y < size_y && y <= y1; y++)
+				for (int y = y2; y < size_y && y <= y1+1; y++)
 				{
 					x = (y - y1) / k + x1;
 					if (x >= 0 && x < size_x)
@@ -319,18 +341,216 @@ size_y is the height of the frame (pixel array)
 							w_v2 = 1 - w_v0 - w_v1
 							;
 						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						int o = y * size_x + x;
 						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
 						{
-							int o = y * size_x + x;
 							if (zBuffer[o] < w)
 							{
 								int
-									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * 1) % size[t][0]),
-									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * 1) % size[t][1])
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
 									;
 								zBuffer[o] = w;
-								pixels[o] = texture[t][v * size[t][0] + u];
+								Uint32 color = texture[t][v * size[t][0] + u];
+								Uint32
+									a = (color & 0xFF000000) * angle,
+									r = (color & 0x00FF0000) * angle,
+									g = (color & 0x0000FF00) * angle,
+									b = (color & 0x000000FF) * angle
+									;
+								pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
 							}
+						}
+						else if (zBuffer[o] == 0)
+						{
+							if(o==length)
+								pixels[o] = pixels[o - 1];
+							else
+								pixels[o] = pixels[o + 1];
+						}
+					}
+				}
+			}
+		}
+	}
+	/*
+	draws a texture to a face ... its simple ...
+	*/
+	void drawTextureToFaceSmooth(double points[], double uvs[], double angles[], int t)
+	{
+		double m = 1;
+		int
+			min_x = min(min(points[0], points[3]), points[6]),
+			max_x = max(max(points[0], points[3]), points[6]),
+			min_y = min(min(points[1], points[4]), points[7]),
+			max_y = max(max(points[1], points[4]), points[7])
+			;
+		double
+			d1 = points[4] - points[7],
+			d2 = points[6] - points[3],
+			d3 = points[7] - points[1],
+			d4 = points[0] - points[6],
+			d0 = d1 * d4 + d2 * (points[1] - points[7])
+			;
+		double
+			u_0 = uvs[0] / points[2],
+			v_0 = uvs[1] / points[2],
+			u_1 = uvs[2] / points[5],
+			v_1 = uvs[3] / points[5],
+			u_2 = uvs[4] / points[8],
+			v_2 = uvs[5] / points[8]
+			;
+		double
+			angle0 = angles[0] / points[2],
+			angle1 = angles[1] / points[5],
+			angle2 = angles[2] / points[8]
+			;
+		if (min_x < 0)
+			min_x = 0;
+		if (min_y < 0)
+			min_y = 0;
+		//draw face
+		for (int y = min_y; y < max_y && y < size_y; y++) {
+			double y1 = y - points[7];
+			int i = y * size_x;
+			for (int x = min_x; x < max_x && x < size_x; x++) {
+				double
+					x1 = x - points[6],
+					w_v0 = (d1 * x1 + d2 * y1) / d0,
+					w_v1 = (d3 * x1 + d4 * y1) / d0,
+					w_v2 = 1 - w_v0 - w_v1
+					;
+				if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
+					int o = i + x;
+					double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+					if (zBuffer[o] < w)
+					{
+						int
+							u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+							v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
+							;
+						zBuffer[o] = w;
+						Uint32 color = texture[t][v * size[t][0] + u];
+						Uint32
+							a = (color & 0xFF000000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+							r = (color & 0x00FF0000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+							g = (color & 0x0000FF00) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+							b = (color & 0x000000FF) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w)
+							;
+						pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+					}
+				}
+			}
+		}
+		//draw edges
+		for (int i = 0; i < 3; i++) {
+			int y, x;
+			double x1, y1, x2, y2;
+			if (i == 0)
+				x1 = points[0], y1 = points[1], x2 = points[3], y2 = points[4];
+			else if (i == 1)
+				x1 = points[3], y1 = points[4], x2 = points[6], y2 = points[7];
+			else
+				x1 = points[6], y1 = points[7], x2 = points[0], y2 = points[1];
+			float k = (y1 - y2) / (x1 - x2);
+			if (abs(x1 - x2) > abs(y1 - y2))
+			{
+				if (x1 < x2) {
+					swap(x1, x2);
+					swap(y1, y2);
+				}
+				if (x2 < 0)
+					x2 = 0;
+				for (int x = x2; x < size_x && x <= x1 + 1; x++)
+				{
+					y = k * (x - x1) + y1;
+					if (y >= 0 && y < size_y)
+					{
+						double y0 = y - points[7];
+						double
+							x1 = x - points[6],
+							w_v0 = (d1 * x1 + d2 * y0) / d0,
+							w_v1 = (d3 * x1 + d4 * y0) / d0,
+							w_v2 = 1 - w_v0 - w_v1
+							;
+						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						int o = y * size_x + x;
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
+						{
+							if (zBuffer[o] < w)
+							{
+								int
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
+									;
+								zBuffer[o] = w;
+								Uint32 color = texture[t][v * size[t][0] + u];
+								Uint32
+									a = (color & 0xFF000000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									r = (color & 0x00FF0000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									g = (color & 0x0000FF00) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									b = (color & 0x000000FF) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w)
+									;
+								pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+							}
+						}
+						else if (zBuffer[o] == 0)
+						{
+							if (o == length)
+								pixels[o] = pixels[o - 1];
+							else
+								pixels[o] = pixels[o + 1];
+						}
+					}
+				}
+			}
+			else
+			{
+				if (y1 < y2) {
+					swap(x1, x2);
+					swap(y1, y2);
+				}
+				if (y2 < 0)
+					y2 = 0;
+				for (int y = y2; y < size_y && y <= y1 + 1; y++)
+				{
+					x = (y - y1) / k + x1;
+					if (x >= 0 && x < size_x)
+					{
+						double y0 = y - points[7];
+						double
+							x1 = x - points[6],
+							w_v0 = (d1 * x1 + d2 * y0) / d0,
+							w_v1 = (d3 * x1 + d4 * y0) / d0,
+							w_v2 = 1 - w_v0 - w_v1
+							;
+						double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
+						int o = y * size_x + x;
+						if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0)
+						{
+							if (zBuffer[o] < w)
+							{
+								int
+									u = abs((int)((((u_0 * w_v0 + u_1 * w_v1 + u_2 * w_v2) / w) * size[t][0]) * m) % size[t][0]),
+									v = abs((int)((((v_0 * w_v0 + v_1 * w_v1 + v_2 * w_v2) / w) * size[t][1]) * m) % size[t][1])
+									;
+								zBuffer[o] = w;
+								Uint32 color = texture[t][v * size[t][0] + u];
+								Uint32
+									a = (color & 0xFF000000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									r = (color & 0x00FF0000) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									g = (color & 0x0000FF00) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
+									b = (color & 0x000000FF) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w)
+									;
+								pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
+							}
+						}
+						else if (zBuffer[o] == 0)
+						{
+							if (o == length)
+								pixels[o] = pixels[o - 1];
+							else
+								pixels[o] = pixels[o + 1];
 						}
 					}
 				}
@@ -469,7 +689,7 @@ public:
 		}
 		cout << "Loading finished!" << endl;
 	}
-	void draw(Scene& scene)
+	void draw(Scene& scene, bool flat)
 	{
 		//scene.getObject(0).getName();
 		//test if there is an active camera
@@ -499,7 +719,13 @@ public:
 				int max = scene.getFaceNumber(i);
 				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
-					if ((0 < (obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos).getZ()))
+					vec3 light(1,0,0);
+					double angle = ((obj.face_normals.at(f).unit() * light.unit()) + 1.0) / 2.0;
+					double angles[3] = {
+						((obj.normals.at(obj.vertex_normals.at(f).at(0) - 1).unit() * light.unit()) + 1.0) / 2.0,
+						((obj.normals.at(obj.vertex_normals.at(f).at(1) - 1).unit() * light.unit()) + 1.0) / 2.0,
+						((obj.normals.at(obj.vertex_normals.at(f).at(2) - 1).unit() * light.unit()) + 1.0) / 2.0
+					};
 						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 						{
 							double points[9];
@@ -535,11 +761,11 @@ public:
 							uvs[4] = uv2.getX();
 							uvs[5] = uv2.getY();
 
-							if ((points[0] > 0 && points[0] < size_x && points[1] > 0 && points[1] < size_y) || (points[3] > 0 && points[3] < size_x && points[4] > 0 && points[4] < size_y) || (points[6] > 0 && points[6] < size_x && points[7] > 0 && points[7] < size_y))
-							{
-								drawTextureToFace(points, uvs, t);
-								//drawFace(outline, points);
-							}
+							if(flat)
+								drawTextureToFaceFlat(points, uvs, angle, t);
+							else
+								drawTextureToFaceSmooth(points, uvs, angles, t);
+							//drawFace(outline, points);
 						}
 				}
 			}
