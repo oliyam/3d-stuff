@@ -126,12 +126,17 @@ class Scene {
 		{
 			cout << "Loading objects ..." << endl;
 			string obj = "spyro";
+			string obj1 = "chest";
 			int num = 1;
+			int num1 = 0;
 			for (int i = 0; i < num; i++) {
 				objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
 				cout << i+1 << " of " << num << " objects loaded: [" << obj << ".obj; " << obj << "_smooth.obj]" << endl;
 			}
-			//objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", true));
+			for (int i = 0; i < num1; i++) {
+				objects.push_back(object(obj1 + ".obj", obj1 + "_smooth.obj", 1));
+				cout << i + 1 << " of " << num1 << " objects loaded: [" << obj1 << ".obj; " << obj1 << "_smooth.obj]" << endl;
+			}
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));

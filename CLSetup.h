@@ -1,8 +1,9 @@
 #pragma once
-/*
-//#include <CL/cl.hpp>
+
+#include <CL/cl.hpp>
 #include <iostream>
-//#include <vector>
+#include <fstream>
+#include <vector>
 
 using std::string;
 using namespace cl;
@@ -52,4 +53,3 @@ Program getProgram(string path)
 
 	return program;
 }
-*/

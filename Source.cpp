@@ -160,7 +160,7 @@ int main(int argc, char* args[])
 				{
 				case SDLK_l:
 					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
-					scene.setObj(0, object("chest.obj", "chest.obj", true));
+					scene.setObj(0, object("chest.obj", "chest_smooth.obj", true));
 					break;
 				case SDLK_LEFT:
 					scene.moveActiveCam(vec3(-0.3, 0, 0));
