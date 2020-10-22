@@ -1,7 +1,6 @@
 ﻿#pragma once
 
 #include <SDL.h>
-//#include <CL/cl.hpp>
 #include <Windows.h>
 #include <stdio.h>
 #include <string>
@@ -62,7 +61,7 @@ int main(int argc, char* args[])
 	;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "spyro";
+	string pictures = "explosion";
 	int number = 12;
 
 	//declare pixel array accommodating all pixels on the screen

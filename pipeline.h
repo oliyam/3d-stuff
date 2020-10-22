@@ -869,6 +869,7 @@ public:
 			}
 			int t = current_texture % number_of_textures;
 			int max = scene.getObjectNumber();
+			//cout << scene.getObjectNumber() << endl;
 			for (int i = 0; i < max; i++) {
 				int max = scene.getFaceNumber(i);
 				object& obj = scene.getObject(i);

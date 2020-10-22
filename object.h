@@ -194,6 +194,7 @@ public:
 		culling = primitive_culling;
 		//reading .obj file with path to smooth object
 		readObj(path, smooth_path);
+		cout << "Object loaded: [" << path << "; " << smooth_path << "]" << endl;
 	}
 
 	//getters
