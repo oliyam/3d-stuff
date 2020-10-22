@@ -155,7 +155,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
-    <ClInclude Include="CLSetup.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="pipeline.h" />
