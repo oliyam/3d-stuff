@@ -803,16 +803,7 @@ private:
 	Uint8* color = NORMALS;
 	int size_x, size_y, length;
 	double* zBuffer;
-	/*
-	//opencl attributes
-	Program halloWelt;
-	Context context;
-	Buffer outBuf, inBuf;
-	Device device;
-	vector<int> vec;
-	CommandQueue queue;
-	Kernel kernel;
-	*/
+	
 public:
 	//constructor
 	Pipeline(string path, int number, int x, int y, Uint32* lel) {
@@ -822,33 +813,7 @@ public:
 		length = x * y;
 		zBuffer = new double[x * y];
 		memset(zBuffer, 0, x * y * sizeof(double));
-		/*
-		//OpenCL stuff
-		halloWelt = getProgram("CLkernels/helloWorld.cl");
-		context = halloWelt.getInfo<CL_PROGRAM_CONTEXT>();
-		vector<Device> devices = context.getInfo<CL_CONTEXT_DEVICES>();
-		device = devices.front();
-
-
-		vec = vector<int>(15);
-		fill(vec.begin(), vec.end(), 10);
-
-		//memory buffer as kernel arguments
-		inBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_NO_ACCESS | CL_MEM_COPY_HOST_PTR, sizeof(int) * vec.size(), vec.data());
-		outBuf = Buffer(context, CL_MEM_WRITE_ONLY | CL_MEM_HOST_READ_ONLY, sizeof(int) * vec.size(), nullptr);
-		kernel = Kernel(halloWelt, "ProcessArray");
-		kernel.setArg(0, inBuf);
-		kernel.setArg(1, outBuf);
-		queue = CommandQueue(context, device);
-
-		//queue.enqueueFillBuffer(inBuf, 3, sizeof(int) * 10, sizeof(int)* (vec.size()-10));
-		queue.enqueueNDRangeKernel(kernel, NullRange, NDRange(vec.size()));
-		queue.enqueueReadBuffer(outBuf, CL_FALSE, 0, sizeof(int) * vec.size(), vec.data());
-		for (int i : vec)
-			cout<< i <<endl;
-		finish();
-		*/
-
+		
 		/*
 		//generates checkerboard texture
 		memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
