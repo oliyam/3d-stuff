@@ -128,8 +128,8 @@ class Scene {
 			string obj = "spyro";
 			string obj1 = "chest";
 			string obj2 = "chili";
-			//objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
-			objects.push_back(object(obj2 + ".obj", obj2 + "_smooth.obj", 1));
+			objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
+			//objects.push_back(object(obj2 + ".obj", obj2 + "_smooth.obj", 1));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));

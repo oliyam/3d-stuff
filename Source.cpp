@@ -61,7 +61,7 @@ int main(int argc, char* args[])
 	;
 	bool hidden = false;
 	int active_camera=0;
-	string pictures = "explosion";
+	string pictures = "spyro";
 	int number = 12;
 
 	//declare pixel array accommodating all pixels on the screen
