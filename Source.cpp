@@ -23,7 +23,7 @@ using namespace std;
 
 typedef chrono::high_resolution_clock Clock;
 
-double multiplikator = 5;
+double multiplikator = 1;
 const int SCREEN_WIDTH = 192 * multiplikator, SCREEN_HEIGHT = 108 * multiplikator;
 
 //console stuff
@@ -78,7 +78,7 @@ int main(int argc, char* args[])
 	cout << "========================================================" << endl;
 	cout << "Loading scene ..." << endl;
 	Scene scene = Scene();
-	Pipeline pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
+	Pipeline *pipe = new Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 
 	int mouseX, mouseY;
 	Uint8 GREEN[4] = { 0,0,255,0 };
@@ -158,7 +158,8 @@ int main(int argc, char* args[])
 				switch (event.key.keysym.sym)
 				{
 				case SDLK_l:
-					pipe = Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
+					delete &pipe;
+					pipe = new Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 					scene.setObj(0, object("chest.obj", "chest_smooth.obj", true));
 					break;
 				case SDLK_LEFT:
@@ -242,7 +243,7 @@ int main(int argc, char* args[])
 				//angle++;
 				
 				scene.setActiveCam(abs(shift) % scene.getCameras().size());
-				pipe.draw(scene, flat%2);
+				pipe->draw(scene, flat%2);
 				if(1)
 				{
 					SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
