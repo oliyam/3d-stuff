@@ -38,7 +38,21 @@ class Scene {
 		}
 
 	public:
+		vector<double> triangle_vertices;
+		vector<double> triangle_vertex_normals;
+		vector<vec3> triangle_face_normals;
+		vector<double> triangle_uvs;
+
+		int getObjectNumber() 
+		{return objects.size();}
+
+		int getFaceNumber(int obj)
+		{return objects.at(obj).faces.size();}
+
 		void rotate(int index, int axis, float angle)
+		{objects.at(index).rotateObj(axis, angle);}
+
+		void rotate(int index, vec3 axis, float angle)
 		{objects.at(index).rotateObj(axis, angle);}
 
 		void rotateCamX(int index) 
@@ -79,6 +93,9 @@ class Scene {
 		vector<object> getObjects()
 		{return objects;}
 
+		object& getObject(int i)
+		{return objects.at(i);}
+
 		vector<vec3> getPositions()
 		{return positions;}
 
@@ -95,26 +112,31 @@ class Scene {
 		//add object at position (0,0,0)
 		void addObject(object obj)
 		{
-				objects.push_back(obj);
-				positions.push_back(vec3(0,0,0));
+			objects.push_back(obj);
+			positions.push_back(vec3(0,0,0));
 		}
 		//add camera 
 		void addCamera(camera cam)
 		{cameras.push_back(cam);}
-		//add light
+		//add lighte
 		void addLight(light light)
 		{lights.push_back(light);}
 
 		Scene() 
 		{
-			for (int i = 1; i <= 2; i++)
-				objects.push_back(object("test.obj", "test_smooth.obj", true));
+			cout << "Loading objects ..." << endl;
+			string obj = "spyro";
+			string obj1 = "chest";
+			string obj2 = "chili";
+			objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));
+			//objects.push_back(object(obj2 + ".obj", obj2 + "_smooth.obj", 1));
 			//objects.push_back(object("grid.obj","grid_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("triangle.obj", "triangle_smooth.obj", false));
 			//objects.push_back(object("torus.obj", "torus_smooth.obj", false));
+			cameras.push_back(camera(vec3(0, 0, -10), vec3(45, 0, 180), 10));
 			for(int i=1;i<=3;i++)
-				cameras.push_back(camera(vec3(i * -10, i * -10, i * -10), vec3(30, -45, 0), 10));
+				cameras.push_back(camera(vec3(i * 10, i * 10, i * 10), vec3(30, -45, 0), 10));
 			lights.push_back(light(vec3(0,0,-10)));
 			cameras.push_back(camera(vec3(0, 0, -10), vec3(0, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 0, 10), vec3(180, 0, 180), 10));
@@ -122,5 +144,6 @@ class Scene {
 			cameras.push_back(camera(vec3(-10, 0, 0), vec3(0, -90, 0), 10));
 			cameras.push_back(camera(vec3(0, -10, 0), vec3(90, 0, 0), 10));
 			cameras.push_back(camera(vec3(0, 10, 0), vec3(-90, 0, 0), 10));		
+
 		}
 };
