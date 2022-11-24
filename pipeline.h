@@ -116,11 +116,11 @@ private:
 	void fillFace(Uint32 color, double points[])
 	{
 		int
-		min_x = min(min(points[0], points[3]), points[6]),
-		max_x = max(max(points[0], points[3]), points[6]),
-		min_y = min(min(points[1], points[4]), points[7]),
-		max_y = max(max(points[1], points[4]), points[7])
-		;
+			min_x = min(min(points[0], points[3]), points[6]),
+			max_x = max(max(points[0], points[3]), points[6]),
+			min_y = min(min(points[1], points[4]), points[7]),
+			max_y = max(max(points[1], points[4]), points[7])
+			;
 		double
 			d0 = (points[4] - points[1]),
 			d1 = (points[7] - points[4]),
@@ -128,7 +128,7 @@ private:
 			d3 = (points[3] - points[0]),
 			d4 = (points[6] - points[3]),
 			d5 = (points[0] - points[6])
-		;
+			;
 		if (min_x < 0)
 			min_x = 0;
 		if (min_y < 0)
@@ -139,8 +139,8 @@ private:
 					e1 = (x - points[0]) * d0 - (y - points[1]) * d3,
 					e2 = (x - points[3]) * d1 - (y - points[4]) * d4,
 					e3 = (x - points[6]) * d2 - (y - points[7]) * d5
-				;
-				if(e1 > 0 && e2 > 0 && e3 > 0) 
+					;
+				if (e1 > 0 && e2 > 0 && e3 > 0)
 					pixels[y * size_x + x] = color;
 			}
 		}
@@ -155,19 +155,19 @@ private:
 			max_x = max(max(points[0], points[3]), points[6]),
 			min_y = min(min(points[1], points[4]), points[7]),
 			max_y = max(max(points[1], points[4]), points[7])
-		;
+			;
 		double
 			d1 = points[4] - points[7],
 			d2 = points[6] - points[3],
 			d3 = points[7] - points[1],
 			d4 = points[0] - points[6],
 			d0 = d1 * d4 + d2 * (points[1] - points[7])
-		;
-		int 
+			;
+		int
 			red_ = red / points[2],
 			green_ = green / points[5],
 			blue_ = blue / points[8]
-		;
+			;
 		if (min_x < 0)
 			min_x = 0;
 		if (min_y < 0)
@@ -181,14 +181,14 @@ private:
 					w_v0 = (d1 * x1 + d2 * y1) / d0,
 					w_v1 = (d3 * x1 + d4 * y1) / d0,
 					w_v2 = 1 - w_v0 - w_v1
-				;
+					;
 				if (w_v0 > 0 && w_v1 > 0 && w_v2 > 0) {
 					int o = i + x;
 					double w = ((1 / points[2]) * w_v0 + (1 / points[5]) * w_v1 + (1 / points[8]) * w_v2);
 					if (zBuffer[o] < w)
 					{
 						zBuffer[o] = w;
-						pixels[o] = (((int)(red_ * w_v0 / w) & 0x00FF0000) | ((int)(green_ * w_v1 / w) & 0x0000FF00) | ((int)(blue_ * w_v2  / w) & 0x000000FF));
+						pixels[o] = (((int)(red_ * w_v0 / w) & 0x00FF0000) | ((int)(green_ * w_v1 / w) & 0x0000FF00) | ((int)(blue_ * w_v2 / w) & 0x000000FF));
 					}
 				}
 			}
@@ -262,9 +262,9 @@ private:
 		for (int i = 0; i < 3; i++) {
 			int y, x;
 			double x1, y1, x2, y2;
-			if(i==0)
+			if (i == 0)
 				x1 = points[0], y1 = points[1], x2 = points[3], y2 = points[4];
-			else if(i==1)
+			else if (i == 1)
 				x1 = points[3], y1 = points[4], x2 = points[6], y2 = points[7];
 			else
 				x1 = points[6], y1 = points[7], x2 = points[0], y2 = points[1];
@@ -277,7 +277,7 @@ private:
 				}
 				if (x2 < 0)
 					x2 = 0;
-				for (int x = x2; x < size_x && x <= x1+1; x++)
+				for (int x = x2; x < size_x && x <= x1 + 1; x++)
 				{
 					y = k * (x - x1) + y1;
 					if (y >= 0 && y < size_y)
@@ -328,7 +328,7 @@ private:
 				}
 				if (y2 < 0)
 					y2 = 0;
-				for (int y = y2; y < size_y && y <= y1+1; y++)
+				for (int y = y2; y < size_y && y <= y1 + 1; y++)
 				{
 					x = (y - y1) / k + x1;
 					if (x >= 0 && x < size_x)
@@ -363,7 +363,7 @@ private:
 						}
 						else if (zBuffer[o] == 0)
 						{
-							if(o==length)
+							if (o == length)
 								pixels[o] = pixels[o - 1];
 							else
 								pixels[o] = pixels[o + 1];
@@ -794,7 +794,7 @@ private:
 		red = 256 * 256 * 255,
 		green = 256 * 255,
 		blue = 255
-	;
+		;
 	Uint8 colors[3][4] = {
 					{ CMY_COLORS[1][0], CMY_COLORS[1][1], CMY_COLORS[1][2], CMY_COLORS[1][3] },
 					{ CMY_COLORS[2][0], CMY_COLORS[2][1], CMY_COLORS[2][2], CMY_COLORS[2][3] },
@@ -803,7 +803,7 @@ private:
 	Uint8* color = NORMALS;
 	int size_x, size_y, length;
 	double* zBuffer;
-	
+
 public:
 	//constructor
 	Pipeline(string path, int number, int x, int y, Uint32* lel) {
@@ -813,7 +813,7 @@ public:
 		length = x * y;
 		zBuffer = new double[x * y];
 		memset(zBuffer, 0, x * y * sizeof(double));
-		
+
 		/*
 		//generates checkerboard texture
 		memset(texture[0], 0, size[0][0] * size[0][1] * sizeof(Uint32));
@@ -837,7 +837,7 @@ public:
 			size[i][1] = (unsigned)((Uint8)texture_file[22] * pow(0x100, 0) + (Uint8)texture_file[23] * pow(0x100, 1) + (Uint8)texture_file[24] * pow(0x100, 2) + (Uint8)texture_file[25] * pow(0x100, 3));
 			size[i][1] = abs(size[i][1]);
 			texture[i] = bitmapToTexture(texture_file, size[i][0], size[i][1]);
-			cout << i + 1 << " of " << number_of_textures << " textures loaded: [" << path << i+1 << ".bmp]" << endl;
+			cout << i + 1 << " of " << number_of_textures << " textures loaded: [" << path << i + 1 << ".bmp]" << endl;
 		}
 		cout << "Loading finished!" << endl;
 	}
@@ -874,63 +874,63 @@ public:
 				int max = scene.getFaceNumber(i);
 				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
-					vec3 light(vec3(1,0,0));
-					/*
+					vec3 light(vec3(1, 0, 0));
+
 					double angle = ((obj.face_normals.at(f).unit() * light.unit()) + 1.0) / 2.0;
-					
+
 					double angles[3] = {
 						((obj.normals.at(obj.vertex_normals.at(f).at(0) - 1).unit() * light.unit()) + 1.0) / 2.0,
 						((obj.normals.at(obj.vertex_normals.at(f).at(1) - 1).unit() * light.unit()) + 1.0) / 2.0,
 						((obj.normals.at(obj.vertex_normals.at(f).at(2) - 1).unit() * light.unit()) + 1.0) / 2.0
 					};
-					
+
 					vec3 normals[3] = {
 						obj.normals.at(obj.vertex_normals.at(f).at(0) - 1).unit(),
 						obj.normals.at(obj.vertex_normals.at(f).at(1) - 1).unit(),
 						obj.normals.at(obj.vertex_normals.at(f).at(2) - 1).unit()
-					};*/
-						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
-						{
-							double points[9];
-							double uvs[6];
+					};
+					if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
+					{
+						double points[9];
+						double uvs[6];
 
-							vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
-							points[2] = point0.getZ();
-							if (points[2] < 1)
-								points[2] = 1;
-							points[0] = (point0.getX() * focus / points[2]) * cam_x + center_x;
-							points[1] = (point0.getY() * focus / points[2]) * cam_y + center_y;
-							vec2 uv0 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(0) - 1);
-							uvs[0] = uv0.getX();
-							uvs[1] = uv0.getY();
+						vec3 point0 = obj.vertices.at(obj.faces.at(f).at(0) - 1) - pos;
+						points[2] = point0.getZ();
+						if (points[2] < 1)
+							points[2] = 1;
+						points[0] = (point0.getX() * focus / points[2]) * cam_x + center_x;
+						points[1] = (point0.getY() * focus / points[2]) * cam_y + center_y;
+						vec2 uv0 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(0) - 1);
+						uvs[0] = uv0.getX();
+						uvs[1] = uv0.getY();
 
-							vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
-							points[5] = point1.getZ();
-							if (points[5] < 1)
-								points[5] = 1;
-							points[3] = (point1.getX() * focus / points[5]) * cam_x + center_x;
-							points[4] = (point1.getY() * focus / points[5]) * cam_y + center_y;
-							vec2 uv1 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(1) - 1);
-							uvs[2] = uv1.getX();
-							uvs[3] = uv1.getY();
+						vec3 point1 = obj.vertices.at(obj.faces.at(f).at(1) - 1) - pos;
+						points[5] = point1.getZ();
+						if (points[5] < 1)
+							points[5] = 1;
+						points[3] = (point1.getX() * focus / points[5]) * cam_x + center_x;
+						points[4] = (point1.getY() * focus / points[5]) * cam_y + center_y;
+						vec2 uv1 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(1) - 1);
+						uvs[2] = uv1.getX();
+						uvs[3] = uv1.getY();
 
-							vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
-							points[8] = point2.getZ();
-							if (points[8] < 1)
-								points[8] = 1;
-							points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
-							points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
-							vec2 uv2 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(2) - 1);
-							uvs[4] = uv2.getX();
-							uvs[5] = uv2.getY();
-							/*
-							if(flat)
-								drawTextureToFaceFlat(points, uvs, angle, t);
-							else
-								drawTextureToFaceSmooth(points, uvs, angles, t);*/
-							drawFace(outline, points);
-							
-						}
+						vec3 point2 = obj.vertices.at(obj.faces.at(f).at(2) - 1) - pos;
+						points[8] = point2.getZ();
+						if (points[8] < 1)
+							points[8] = 1;
+						points[6] = (point2.getX() * focus / points[8]) * cam_x + center_x;
+						points[7] = (point2.getY() * focus / points[8]) * cam_y + center_y;
+						vec2 uv2 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(2) - 1);
+						uvs[4] = uv2.getX();
+						uvs[5] = uv2.getY();
+
+						if (flat)
+							drawTextureToFaceFlat(points, uvs, angle, t);
+						else
+							drawTextureToFaceSmooth(points, uvs, angles, t);
+						//drawFace(outline, points);
+
+					}
 				}
 			}
 		}
