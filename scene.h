@@ -125,7 +125,7 @@ class Scene {
 		Scene() 
 		{
 			cout << "Loading objects ..." << endl;
-			string obj = "spyro";
+			string obj = "Hand";
 			string obj1 = "chest";
 			string obj2 = "chili";
 			objects.push_back(object(obj + ".obj", obj + "_smooth.obj", 1));

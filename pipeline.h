@@ -875,7 +875,7 @@ public:
 				object& obj = scene.getObject(i);
 				for (int f = 0; f < max; f++) {
 					vec3 light(vec3(1,0,0));
-					
+					/*
 					double angle = ((obj.face_normals.at(f).unit() * light.unit()) + 1.0) / 2.0;
 					
 					double angles[3] = {
@@ -888,7 +888,7 @@ public:
 						obj.normals.at(obj.vertex_normals.at(f).at(0) - 1).unit(),
 						obj.normals.at(obj.vertex_normals.at(f).at(1) - 1).unit(),
 						obj.normals.at(obj.vertex_normals.at(f).at(2) - 1).unit()
-					};
+					};*/
 						if (0 < (obj.face_normals.at(f) * (pos - obj.vertices.at(obj.faces.at(f).at(0) - 1))))
 						{
 							double points[9];
@@ -923,12 +923,12 @@ public:
 							vec2 uv2 = obj.uv_texture_coordinates.at(obj.uv.at(f).at(2) - 1);
 							uvs[4] = uv2.getX();
 							uvs[5] = uv2.getY();
-							
+							/*
 							if(flat)
 								drawTextureToFaceFlat(points, uvs, angle, t);
 							else
-								drawTextureToFaceSmooth(points, uvs, angles, t);
-							//drawFace(outline, points);
+								drawTextureToFaceSmooth(points, uvs, angles, t);*/
+							drawFace(outline, points);
 							
 						}
 				}
