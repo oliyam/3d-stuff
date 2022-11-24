@@ -376,8 +376,10 @@ private:
 	/*
 	draws a texture to a face ... its simple ...
 	*/
-	void drawTextureToFaceSmooth(double points[], double uvs[], double angles[], int t)
+	bool drawTextureToFaceSmooth(double points[], double uvs[], double angles[], int t)
 	{
+		bool selected = false;
+
 		double m = 1;
 		int
 			min_x = min(min(points[0], points[3]), points[6]),
@@ -437,6 +439,9 @@ private:
 							g = (color & 0x0000FF00) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w),
 							b = (color & 0x000000FF) * ((angle0 * w_v0 + angle1 * w_v1 + angle2 * w_v2) / w)
 							;
+						if (mouseX == x && mouseY == y)
+							selected = true;
+
 						pixels[o] = (a & 0xFF000000) | (r & 0x00FF0000) | (g & 0x0000FF00) | (b & 0x000000FF);
 					}
 				}
@@ -556,6 +561,8 @@ private:
 				}
 			}
 		}
+
+		return selected;
 	}
 	/*
 	draws a texture to a face ... its simple ...
@@ -804,6 +811,9 @@ private:
 	int size_x, size_y, length;
 	double* zBuffer;
 
+	int mouseX, mouseY;
+	double selected_face[9];
+
 public:
 	//constructor
 	Pipeline(string path, int number, int x, int y, Uint32* lel) {
@@ -843,10 +853,14 @@ public:
 	}
 
 	//draw scene
-	void draw(Scene& scene, bool flat)
+	void draw(Scene& scene, bool flat, int mouse_X, int mouse_Y)
 	{
 		//scene.getObject(0).getName();
 		//test if there is an active camera
+
+		mouseX = mouse_X;
+		mouseY = mouse_Y;
+		
 		if (scene.activeCam() != -1) {
 			memset(zBuffer, 0, size_x * size_y * sizeof(double));
 			int center_x = size_x / 2;
@@ -927,12 +941,15 @@ public:
 						if (flat)
 							drawTextureToFaceFlat(points, uvs, angle, t);
 						else
-							drawTextureToFaceSmooth(points, uvs, angles, t);
-						//drawFace(outline, points);
-
-					}
+							if (drawTextureToFaceSmooth(points, uvs, angles, t))
+								for (int punkt = 0; punkt < 9; punkt++)
+									selected_face[punkt] = points[punkt];
+					} 
 				}
 			}
 		}
+		//fill selected face
+		if(selected_face != NULL)
+			fillFace(0xFFFF0000, selected_face);
 	}
 };

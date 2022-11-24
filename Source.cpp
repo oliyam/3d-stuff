@@ -86,7 +86,7 @@ int main(int argc, char* args[])
 	Scene scene = Scene();
 	Pipeline* pipe = new Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 
-	int mouseX, mouseY;
+	int mouseX=0, mouseY=0;
 	Uint8 GREEN[4] = { 0,0,255,0 };
 	Uint8 BLACK[4] = { 0,0,0,0 };
 
@@ -154,6 +154,8 @@ int main(int argc, char* args[])
 				scene.rotate(0, vec3(1, 0, 0), event.motion.yrel);
 				event.type = NULL;
 			}
+			SDL_GetMouseState(&mouseX, &mouseY);
+			SDL_SetWindowTitle(window, ("x: " + to_string(mouseX) + ", y: " + to_string(mouseY)).c_str());
 			break;
 		case SDL_MOUSEWHEEL:
 			scene.moveActiveCam(vec3(0, 0, event.wheel.y));
@@ -163,7 +165,7 @@ int main(int argc, char* args[])
 			switch (event.key.keysym.sym)
 			{
 			case SDLK_l:
-				delete& pipe;
+				//delete& pipe;
 				pipe = new Pipeline(pictures, number, SCREEN_WIDTH, SCREEN_HEIGHT, pixels);
 				scene.setObj(0, object("chest.obj", "chest_smooth.obj", true));
 				break;
@@ -248,7 +250,7 @@ int main(int argc, char* args[])
 			//angle++;
 
 			scene.setActiveCam(abs(shift) % scene.getCameras().size());
-			pipe->draw(scene, flat % 2);
+			pipe->draw(scene, flat % 2, mouseX, mouseY);
 			if (1)
 			{
 				SDL_UpdateTexture(texture, NULL, pixels, SCREEN_WIDTH * sizeof(Uint32));
@@ -265,7 +267,7 @@ int main(int argc, char* args[])
 		chrono::duration<double> time_span = currentTime - startTime;
 		chrono::duration<double> time_span_fps_print = currentTime - lastTime;
 		if (time_span_fps_print.count() >= 1) {
-			SDL_SetWindowTitle(window, ("FPS: " + to_string(1 / time_span.count())).c_str());
+			//SDL_SetWindowTitle(window, ("FPS: " + to_string(1 / time_span.count()) + "; x: " + to_string(mouseX) + ", y: " + to_string(mouseY)).c_str());
 			lastTime = Clock::now();
 		}
 	}
