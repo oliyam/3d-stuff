@@ -949,7 +949,9 @@ public:
 			}
 		}
 		//fill selected face
-		if(selected_face != NULL)
+		if (*selected_face != NULL) {
 			fillFace(0xFFFF0000, selected_face);
+			*selected_face = NULL;
+		}
 	}
 };
